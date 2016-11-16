@@ -1,0 +1,222 @@
+swagger: '2.0'
+
+info:
+  version: "0.0.1"
+  title: Thermostat Web API
+
+# Describe your paths here
+paths:
+  /agents/{agentId}/host:
+    parameters:
+      - $ref: '#/parameters/agentId'   
+    get:
+      description: Gets host information for an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/host-info'   
+  /agents:
+    get:
+      description: Gets information for all agents
+      responses:
+        200:
+          description: Successful response
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/agent-info'
+  /agents/{agentId}:
+    parameters:
+      - $ref: '#/parameters/agentId'    
+    get:
+      description: Gets information for an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/agent-info'               
+  /agents/{agentId}/vms:
+    parameters:
+      - $ref: '#/parameters/agentId'   
+    get:
+      description: Gets information for all jvms monitored by an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/jvm-info'
+  /agents/{agentId}/vms/{vmId}:
+    # This is a HTTP operation
+    parameters:
+      - $ref: '#/parameters/agentId'
+      - $ref: '#/parameters/vmId'    
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: Gets information for a jvm monitored by an agent
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/jvm-info'
+  
+# Collections in 2.0: revision 3c990cdff9ad
+# schema-info
+# vm-jmx-notification-stats
+# vm-io-stats
+# numa-host-info
+# vm-memory-stats
+# vm-cpu-stats
+# numa-stat
+# vm-thread-state
+# vm-numa-stats
+# vm-thread-session
+# thread-contention-sample
+# memory-stats
+# vm-class-stats
+# backend-info
+# network-info
+# host-info
+# cpu-stats
+# profile-info
+# vm-gc-stats
+# profile-status
+# vm-thread-lock
+# vm-deadlock-data
+# vm-thread-summary
+# vm-tlab-stats
+# vm-thread-harvesting
+# vm-info
+# vm-compiler-stats
+# vm-heap-info
+# agent-config
+# vm-jmx-notification
+
+definitions:
+  agent-info:
+    type: object
+  host-info:
+    type: object
+  jvm-info:
+    type: object
+    properties:
+      _id:
+        type: object
+        properties:
+          "$oid":
+            type: string
+        required:
+        - "$oid"
+      agentId:
+        type: string
+      vmId:
+        type: string
+      vmPid:
+        type: integer
+      startTimeStamp:
+        type: object
+        properties:
+          "$numberLong":
+            type: string
+        required:
+        - "$numberLong"
+      stopTimeStamp:
+        type: object
+        properties:
+          "$numberLong":
+            type: string
+        required:
+        - "$numberLong"
+      javaVersion:
+        type: string
+      javaHome:
+        type: string
+      mainClass:
+        type: string
+      javaCommandLine:
+        type: string
+      vmName:
+        type: string
+      vmArguments:
+        type: string
+      vmInfo:
+        type: string
+      vmVersion:
+        type: string
+      propertiesAsArray:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+          required:
+          - key
+          - value
+      environmentAsArray:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+          required:
+          - key
+          - value
+      loadedNativeLibraries:
+        type: array
+        items: {}
+      uid:
+        type: object
+        properties:
+          "$numberLong":
+            type: string
+        required:
+        - "$numberLong"
+      username:
+        type: string
+    required:
+      - _id
+      - agentId
+      - vmId
+      - vmPid
+      - startTimeStamp
+      - stopTimeStamp
+      - javaVersion
+      - javaHome
+      - mainClass
+      - javaCommandLine
+      - vmName
+      - vmArguments
+      - vmInfo
+      - vmVersion
+      - propertiesAsArray
+      - environmentAsArray
+      - loadedNativeLibraries
+      - uid
+      - username
+      
+parameters:
+  agentId:
+    name: agentId
+    in: path
+    description: The agent identification number
+    type: number
+    required: true
+  vmId:
+    name: vmId
+    in: path
+    description: The jvm identification number
+    type: number
+    required: true    
