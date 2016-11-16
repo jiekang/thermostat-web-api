@@ -63,10 +63,11 @@ public class WebEndpointCommand extends AbstractCommand {
 
     @Override
     public void run(CommandContext ctx) throws CommandException {
-        startServer();
+        int port = Integer.valueOf(ctx.getArguments().getNonOptionArguments().get(0));
+        startServer(port);
     }
 
-    private void startServer() {
+    private void startServer(int port) {
         URI baseUri = UriBuilder.fromUri("http://localhost").port(8080).build();
         ResourceConfig config = new ResourceConfig();
         config.register(new HttpHandler());
@@ -76,7 +77,7 @@ public class WebEndpointCommand extends AbstractCommand {
         ServerConnector httpConnector = new ServerConnector(server);
         httpConnector.setHost("localhost");
         httpConnector.setIdleTimeout(30000);
-        httpConnector.setPort(8082);
+        httpConnector.setPort(port);
 
         server.setConnectors(new Connector[]{httpConnector});
 
