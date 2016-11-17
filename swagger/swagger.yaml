@@ -6,18 +6,38 @@ info:
 
 # Describe your paths here
 paths:
-  /agents/{agentId}/host:
-    parameters:
-      - $ref: '#/parameters/agentId'   
+  /:
     get:
-      description: Gets host information for an agent
+      description: Gets information on all agents
       responses:
         200:
           description: Successful response
           schema:
               type: array
               items:
-                $ref: '#/definitions/host-info'   
+                $ref: '#/definitions/agent-info'       
+  /{agentId}:
+    parameters:
+      - $ref: '#/parameters/agentId'    
+    get:
+      description: Gets information for an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/agent-info'     
+  /{agentId}/{vmId}:
+    parameters:
+      - $ref: '#/parameters/agentId'
+      - $ref: '#/parameters/vmId'    
+    get:
+      description: Gets information for a jvm monitored by an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/jvm-info'
+            
   /agents:
     get:
       description: Gets information for all agents
@@ -40,6 +60,18 @@ paths:
               type: array
               items:
                 $ref: '#/definitions/agent-info'               
+  /agents/{agentId}/host:
+    parameters:
+      - $ref: '#/parameters/agentId'   
+    get:
+      description: Gets host information for an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/host-info'   
   /agents/{agentId}/vms:
     parameters:
       - $ref: '#/parameters/agentId'   
@@ -53,53 +85,81 @@ paths:
               items:
                 $ref: '#/definitions/jvm-info'
   /agents/{agentId}/vms/{vmId}:
-    # This is a HTTP operation
     parameters:
       - $ref: '#/parameters/agentId'
       - $ref: '#/parameters/vmId'    
     get:
-      # Describe this verb here. Note: you can use markdown
       description: Gets information for a jvm monitored by an agent
       responses:
-        # Response code
         200:
           description: Successful response
           schema:
             $ref: '#/definitions/jvm-info'
-  
+            
+
 # Collections in 2.0: revision 3c990cdff9ad
+
 # schema-info
-# vm-jmx-notification-stats
-# vm-io-stats
-# numa-host-info
-# vm-memory-stats
-# vm-cpu-stats
-# numa-stat
-# vm-thread-state
-# vm-numa-stats
-# vm-thread-session
-# thread-contention-sample
-# memory-stats
-# vm-class-stats
-# backend-info
-# network-info
+# agent-config
+
 # host-info
+# network-info
+# backend-info
+
+# numa-host-info
+# numa-stat
 # cpu-stats
-# profile-info
+  /agents/host/cpu:
+    get:
+      description: Gets cpu information for the host
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/host-cpu-info'
+# memory-stats
+
+# vm-class-stats
 # vm-gc-stats
+# vm-numa-stats
+# vm-cpu-stats
+  /agents/{agentId}/vms/{vmId}/cpu:
+    parameters:
+      - $ref: '#/parameters/agentId'
+      - $ref: '#/parameters/vmId'    
+    get:
+      description: Gets cpu information for the vm
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/host-cpu-info'
+# vm-memory-stats
+# vm-io-stats
+# vm-compiler-stats
+# vm-heap-info
+# vm-jmx-notification
+# vm-jmx-notification-stats
+
+# thread-contention-sample
+
 # profile-status
+# profile-info
+
+# vm-thread-state
+# vm-thread-session
+
 # vm-thread-lock
 # vm-deadlock-data
 # vm-thread-summary
 # vm-tlab-stats
 # vm-thread-harvesting
+
 # vm-info
-# vm-compiler-stats
-# vm-heap-info
-# agent-config
-# vm-jmx-notification
 
 definitions:
+  host-cpu-info:
+    type: object
   agent-info:
     type: object
   host-info:
@@ -206,7 +266,7 @@ definitions:
       - loadedNativeLibraries
       - uid
       - username
-      
+
 parameters:
   agentId:
     name: agentId
