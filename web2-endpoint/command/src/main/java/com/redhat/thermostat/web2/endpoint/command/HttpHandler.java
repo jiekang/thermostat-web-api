@@ -36,19 +36,71 @@
 
 package com.redhat.thermostat.web2.endpoint.command;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Filters;
 
 @Path("")
 public class HttpHandler {
 
+
     @GET
-    @Path("{collection}")
-    @Produces(MediaType.TEXT_HTML)
-    public String getCollection(@PathParam("collection") String collectionName) {
-        return collectionName;
+    @Path("vm-cpu")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getAllVmCpuInfo() {
+        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
+        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find().sort(new BasicDBObject("_id", -1));
+            }
+        });
+
+        return DocumentResponse.build(documents, request.getElapsed());
+    }
+
+    @GET
+    @Path("agents/{agentId}/vms/{vmId}/cpu")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getVmCpuInfo(@PathParam("agentId") String agentId,
+                                @PathParam("vmId") String vmId,
+                                @QueryParam("count") @DefaultValue("1") String count,
+                                @QueryParam("maxTimestamp") String maxTimestamp,
+                                @QueryParam("minTimestamp") String minTimestamp) {
+
+        System.out.println("a: " + agentId + "\nb: " + vmId + "\nc: " + count + "\nd: " + maxTimestamp + "\ne: " + minTimestamp);
+
+        final int size = Integer.valueOf(count);
+
+        Bson filter = Filters.and(Filters.eq("agentId", agentId), Filters.eq("vmId", vmId));
+
+        if (maxTimestamp != null) {
+            filter = Filters.and(Filters.lte("timeStamp", Long.valueOf(maxTimestamp)), filter);
+        }
+        if (minTimestamp != null) {
+            filter = Filters.and(Filters.gte("timeStamp", Long.valueOf(minTimestamp)), filter);
+        }
+
+        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
+        final Bson finalFilter = filter;
+        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find(finalFilter).sort(new BasicDBObject("_id", -1)).limit(size);
+            }
+        });
+
+        return DocumentResponse.build(documents, request.getElapsed());
     }
 }

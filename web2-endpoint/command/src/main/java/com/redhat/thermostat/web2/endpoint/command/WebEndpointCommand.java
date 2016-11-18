@@ -60,11 +60,20 @@ import com.redhat.thermostat.common.cli.CommandException;
 public class WebEndpointCommand extends AbstractCommand {
 
     private Server server;
+    private MongoStorage storage;
 
     @Override
     public void run(CommandContext ctx) throws CommandException {
         int port = Integer.valueOf(ctx.getArguments().getNonOptionArguments().get(0));
+
+        setupMongodb();
+
         startServer(port);
+    }
+
+    private void setupMongodb() {
+        storage = new MongoStorage("thermostat", 27518);
+        storage.start();
     }
 
     private void startServer(int port) {
@@ -87,6 +96,7 @@ public class WebEndpointCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            storage.finish();
             stop();
         }
     }

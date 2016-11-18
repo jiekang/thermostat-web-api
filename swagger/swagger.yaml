@@ -126,38 +126,73 @@ paths:
   /agents/{agentId}/vms/{vmId}/cpu:
     parameters:
       - $ref: '#/parameters/agentId'
-      - $ref: '#/parameters/vmId'    
+      - $ref: '#/parameters/vmId'
     get:
-      description: Gets cpu information for the vm
+      description: Gets most recent cpu information for the jvm
       responses:
         200:
           description: Successful response
           schema:
             $ref: '#/definitions/host-cpu-info'
+      parameters:
+        - name: count
+          in: query
+          description: Count of media to return.
+          type: integer
+        - name: max_timestamp
+          in: query
+          description: Return media before this timestamp.
+          type: integer
+        - name: min_timestamp
+          in: query
+          description: Return media after this timestamp.
+          type: integer      
+    post:
+      description: Adds cpu information for the jvm
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/host-cpu-info'
+
 # vm-memory-stats
 # vm-io-stats
 # vm-compiler-stats
 # vm-heap-info
 # vm-jmx-notification
 # vm-jmx-notification-stats
+# vm-tlab-stats
 
-# thread-contention-sample
 
 # profile-status
 # profile-info
 
-# vm-thread-state
+# vm-thread-summary
 # vm-thread-session
+# vm-thread-state
 
 # vm-thread-lock
 # vm-deadlock-data
-# vm-thread-summary
-# vm-tlab-stats
-# vm-thread-harvesting
+
+# vm-thread-harvesting TODO: Improve collection schema and function
 
 # vm-info
 
 definitions:
+  filter:
+    type: object
+    properties:
+      key:
+        type: string
+      comparator:
+        type: string
+      value:
+        type: string
+    required:
+      - key
+      - comparator
+      - value
+
   host-cpu-info:
     type: object
   agent-info:

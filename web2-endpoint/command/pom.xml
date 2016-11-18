@@ -152,6 +152,13 @@
             <version>1.9.12</version>
         </dependency>
 
+        <!-- MongoDB dependencies -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>${mongo-java-driver-version}</version>
+        </dependency>
+
         <!-- test scoped deps -->
         <!--<dependency>-->
             <!--<groupId>junit</groupId>-->

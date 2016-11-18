@@ -58,6 +58,7 @@
         <jetty-version>9.2.19.v20160908</jetty-version>
         <glassfish-version>2.5.0-b05</glassfish-version>
         <java-version>1.7</java-version>
+        <mongo-java-driver-version>3.2.1</mongo-java-driver-version>
     </properties>
 
     <build>
