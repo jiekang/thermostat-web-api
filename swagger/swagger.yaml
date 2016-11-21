@@ -139,6 +139,10 @@ paths:
           in: query
           description: Count of media to return.
           type: integer
+        - name: sort
+          in: query
+          description: Order to sort by (1 or -1).
+          type: integer          
         - name: max_timestamp
           in: query
           description: Return media before this timestamp.
@@ -146,8 +150,29 @@ paths:
         - name: min_timestamp
           in: query
           description: Return media after this timestamp.
-          type: integer      
+          type: integer
     post:
+      description: Gets most recent cpu information for the jvm
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/host-cpu-info'
+      parameters:
+        - name: filter
+          in: body
+          description: Key, Comparator, Value trios to filter the 
+          schema:
+            $ref: '#/definitions/filter'
+        - name: count
+          in: query
+          description: Count of media to return.
+          type: integer
+        - name: sort
+          in: query
+          description: Order to sort by (1 or -1).
+          type: integer                 
+    put:
       description: Adds cpu information for the jvm
       responses:
         200:
@@ -271,7 +296,16 @@ definitions:
           - value
       loadedNativeLibraries:
         type: array
-        items: {}
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: string
+          required:
+          - key
+          - value
       uid:
         type: object
         properties:

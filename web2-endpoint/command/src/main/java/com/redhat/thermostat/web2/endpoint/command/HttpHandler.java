@@ -38,6 +38,8 @@ package com.redhat.thermostat.web2.endpoint.command;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -53,7 +55,6 @@ import com.mongodb.client.model.Filters;
 
 @Path("")
 public class HttpHandler {
-
 
     @GET
     @Path("vm-cpu")
@@ -76,6 +77,7 @@ public class HttpHandler {
     public String getVmCpuInfo(@PathParam("agentId") String agentId,
                                 @PathParam("vmId") String vmId,
                                 @QueryParam("count") @DefaultValue("1") String count,
+                                @QueryParam("sort") @DefaultValue("-1") String sort,
                                 @QueryParam("maxTimestamp") String maxTimestamp,
                                 @QueryParam("minTimestamp") String minTimestamp) {
 
@@ -92,15 +94,39 @@ public class HttpHandler {
             filter = Filters.and(Filters.gte("timeStamp", Long.valueOf(minTimestamp)), filter);
         }
 
+        final int sortOrder = Integer.valueOf(sort);
+
         TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
         final Bson finalFilter = filter;
         FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
             public FindIterable<Document> run() {
-                return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find(finalFilter).sort(new BasicDBObject("_id", -1)).limit(size);
+                return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find(finalFilter).sort(new BasicDBObject("_id", sortOrder)).limit(size);
             }
         });
 
         return DocumentResponse.build(documents, request.getElapsed());
+    }
+
+    @POST
+    @Path("agents/{agentId}/vms/{vmId}/cpu")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String postVmCpuInfo(String body,
+                                @PathParam("agentId") String agentId,
+                                @PathParam("vmId") String vmId,
+                                @QueryParam("count") @DefaultValue("1") String count,
+                                @QueryParam("sort") @DefaultValue("-1") String sort) {
+        return "POST " + agentId + " " + vmId + "\n\n" + body;
+    }
+
+    @PUT
+    @Path("agents/{agentId}/vms/{vmId}/cpu")
+    @Produces(MediaType.TEXT_HTML)
+    public String putVmCpuInfo(String body,
+                               @PathParam("agentId") String agentId,
+                               @PathParam("vmId") String vmId,
+                               @QueryParam("count") @DefaultValue("1") String count,
+                               @QueryParam("sort") @DefaultValue("-1") String sort) {
+        return "PUT " + agentId + " " + vmId + "\n\n" + body;
     }
 }
