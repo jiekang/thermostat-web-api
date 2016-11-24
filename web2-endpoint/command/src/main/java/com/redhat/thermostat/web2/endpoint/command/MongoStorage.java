@@ -3,6 +3,7 @@ package com.redhat.thermostat.web2.endpoint.command;
 import java.util.Arrays;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
@@ -25,8 +26,14 @@ public class MongoStorage {
     public void start() {
         MongoCredential credential = MongoCredential.createCredential(username, dbName, password);
         ServerAddress address = new ServerAddress("127.0.0.1", port);
-        mongoClient = new MongoClient(address, Arrays.asList(credential));
-        database = mongoClient.getDatabase(dbName);
+        mongoClient = new MongoClient(address, Arrays.asList(credential), new MongoClientOptions.Builder().serverSelectionTimeout(0).build());
+        try {
+            mongoClient.getAddress();
+            database = mongoClient.getDatabase(dbName);
+        } catch (Exception e) {
+            System.out.println("Could not connect to Mongodb instance");
+            mongoClient.close();
+        }
     }
 
     public void finish() {

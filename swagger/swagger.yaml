@@ -159,11 +159,11 @@ paths:
           schema:
             $ref: '#/definitions/host-cpu-info'
       parameters:
-        - name: filter
+        - name: filters
           in: body
-          description: Key, Comparator, Value trios to filter the 
+          description: Key, Comparator, Value trios to filter the data
           schema:
-            $ref: '#/definitions/filter'
+            $ref: '#/definitions/filters'
         - name: count
           in: query
           description: Count of media to return.
@@ -204,6 +204,10 @@ paths:
 # vm-info
 
 definitions:
+  filters:
+    type: array
+    items:
+      $ref: '#/definitions/filter'
   filter:
     type: object
     properties:

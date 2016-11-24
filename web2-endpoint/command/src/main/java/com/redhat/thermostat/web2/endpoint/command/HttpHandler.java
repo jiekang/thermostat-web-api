@@ -60,6 +60,10 @@ public class HttpHandler {
     @Path("vm-cpu")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllVmCpuInfo() {
+        if (null == MongoStorage.getDatabase()) {
+            return "vm-cpu";
+        }
+
         TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
         FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
@@ -81,7 +85,9 @@ public class HttpHandler {
                                 @QueryParam("maxTimestamp") String maxTimestamp,
                                 @QueryParam("minTimestamp") String minTimestamp) {
 
-        System.out.println("a: " + agentId + "\nb: " + vmId + "\nc: " + count + "\nd: " + maxTimestamp + "\ne: " + minTimestamp);
+        if (null == MongoStorage.getDatabase()) {
+            return agentId + vmId + count + sort + maxTimestamp + minTimestamp;
+        }
 
         final int size = Integer.valueOf(count);
 
@@ -116,6 +122,9 @@ public class HttpHandler {
                                 @PathParam("vmId") String vmId,
                                 @QueryParam("count") @DefaultValue("1") String count,
                                 @QueryParam("sort") @DefaultValue("-1") String sort) {
+        if (null == MongoStorage.getDatabase()) {
+            return body + agentId + vmId + count + sort;
+        }
         return "POST " + agentId + " " + vmId + "\n\n" + body;
     }
 
@@ -127,6 +136,9 @@ public class HttpHandler {
                                @PathParam("vmId") String vmId,
                                @QueryParam("count") @DefaultValue("1") String count,
                                @QueryParam("sort") @DefaultValue("-1") String sort) {
+        if (null == MongoStorage.getDatabase()) {
+            return body + agentId + vmId + count + sort;
+        }
         return "PUT " + agentId + " " + vmId + "\n\n" + body;
     }
 }
