@@ -60,7 +60,7 @@ public class HttpHandler {
     @Path("vm-cpu")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllVmCpuInfo() {
-        if (null == MongoStorage.getDatabase()) {
+        if (!MongoStorage.isConnected()) {
             return "vm-cpu";
         }
 
@@ -85,7 +85,7 @@ public class HttpHandler {
                                 @QueryParam("maxTimestamp") String maxTimestamp,
                                 @QueryParam("minTimestamp") String minTimestamp) {
 
-        if (null == MongoStorage.getDatabase()) {
+        if (!MongoStorage.isConnected()) {
             return agentId + vmId + count + sort + maxTimestamp + minTimestamp;
         }
 
@@ -122,7 +122,7 @@ public class HttpHandler {
                                 @PathParam("vmId") String vmId,
                                 @QueryParam("count") @DefaultValue("1") String count,
                                 @QueryParam("sort") @DefaultValue("-1") String sort) {
-        if (null == MongoStorage.getDatabase()) {
+        if (!MongoStorage.isConnected()) {
             return body + agentId + vmId + count + sort;
         }
         return "POST " + agentId + " " + vmId + "\n\n" + body;
@@ -136,7 +136,7 @@ public class HttpHandler {
                                @PathParam("vmId") String vmId,
                                @QueryParam("count") @DefaultValue("1") String count,
                                @QueryParam("sort") @DefaultValue("-1") String sort) {
-        if (null == MongoStorage.getDatabase()) {
+        if (!MongoStorage.isConnected()) {
             return body + agentId + vmId + count + sort;
         }
         return "PUT " + agentId + " " + vmId + "\n\n" + body;

@@ -66,14 +66,9 @@ public class WebEndpointCommand extends AbstractCommand {
     public void run(CommandContext ctx) throws CommandException {
         int port = Integer.valueOf(ctx.getArguments().getNonOptionArguments().get(0));
 
-        setupMongodb();
+        MongoStorage.start("thermostat", 27518);
 
         startServer(port);
-    }
-
-    private void setupMongodb() {
-        storage = new MongoStorage("thermostat", 27518);
-        storage.start();
     }
 
     private void startServer(int port) {

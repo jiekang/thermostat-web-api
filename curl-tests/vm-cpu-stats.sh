@@ -11,7 +11,8 @@ QUERY2="${BASE}?count=4&sort=1"
 BODY="hello"
 
 OUT=$(get ${BASE})
-if [ "111-1nullnull" == "${OUT}" ] ; then
+EXPECT="111-1nullnull"
+if [ "${EXPECT}" == "${OUT}" ] ; then
   echo "Pass : GET ${BASE}"
 else
   echo "Fail : GET ${BASE}"
@@ -19,7 +20,8 @@ else
 fi
 
 OUT=$(get ${QUERY})
-if [ "115121" == "${OUT}" ] ; then
+EXPECT="115121"
+if [ "${EXPECT}" == "${OUT}" ] ; then
   echo "Pass : GET ${QUERY}"
 else
   echo "Fail : GET ${QUERY}"
@@ -27,7 +29,8 @@ else
 fi
 
 OUT=$(post ${BASE})
-if [ "111-1" == "${OUT}" ] ; then
+EXPECT="111-1"
+if [ "${EXPECT}" == "${OUT}" ] ; then
   echo "Pass : POST ${BASE}"
 else
   echo "Fail : POST ${BASE}"
@@ -35,7 +38,8 @@ else
 fi
 
 OUT=$(post ${QUERY2} ${BODY})
-if [ "${BODY}1141" == "${OUT}" ] ; then
+EXPECT="${BODY}1141"
+if [ "${EXPECT}" == "${OUT}" ] ; then
   echo "Pass : POST ${QUERY2} with body ${BODY}"
 else
   echo "Fail : POST ${QUERY2} with body ${BODY}"
@@ -43,7 +47,8 @@ else
 fi
 
 OUT=$(put ${BASE})
-if [ "111-1" == "${OUT}" ] ; then
+EXPECT="111-1"
+if [ "${EXPECT}" == "${OUT}" ] ; then
   echo "Pass : PUT ${BASE}"
 else
   echo "Fail : PUT ${BASE}"
@@ -51,13 +56,13 @@ else
 fi
 
 OUT=$(put ${QUERY2} ${BODY})
+EXPECT="${BODY}1141"
 if [ "${BODY}1141" == "${OUT}" ] ; then
   echo "Pass : POST ${QUERY2} with body ${BODY}"
 else
   echo "Fail : POST ${QUERY2} with body ${BODY}"
   FAIL=1
 fi
-
 
 
 if [ "1" -eq "$FAIL" ] ; then

@@ -9,31 +9,27 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoDatabase;
 
 public class MongoStorage {
-    private MongoClient mongoClient;
-    private final String dbName;
-    private final int port;
+    private static MongoClient mongoClient;
 
-    private String username = "mongodevuser";
-    private char[] password = "mongodevpassword".toCharArray();
+    private static final String username = "mongodevuser";
+    private static final char[] password = "mongodevpassword".toCharArray();
+    private static String dbName;
 
-    private static MongoDatabase database;
-
-    public MongoStorage(String dbName, int port) {
-        this.dbName = dbName;
-        this.port = port;
-    }
-
-    public void start() {
+    public static void start(final String dbName, int port) {
+        MongoStorage.dbName = dbName;
         MongoCredential credential = MongoCredential.createCredential(username, dbName, password);
         ServerAddress address = new ServerAddress("127.0.0.1", port);
         mongoClient = new MongoClient(address, Arrays.asList(credential), new MongoClientOptions.Builder().serverSelectionTimeout(0).build());
+    }
+
+    public static boolean isConnected() {
         try {
             mongoClient.getAddress();
-            database = mongoClient.getDatabase(dbName);
         } catch (Exception e) {
-            System.out.println("Could not connect to Mongodb instance");
-            mongoClient.close();
+            return false;
         }
+
+        return true;
     }
 
     public void finish() {
@@ -41,6 +37,6 @@ public class MongoStorage {
     }
 
     public static MongoDatabase getDatabase() {
-        return MongoStorage.database;
+        return MongoStorage.mongoClient.getDatabase(MongoStorage.dbName);
     }
 }
