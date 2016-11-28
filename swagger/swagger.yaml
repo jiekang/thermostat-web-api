@@ -5,18 +5,11 @@ info:
   title: Thermostat Web API
 
 # Describe your paths here
+
 paths:
-  /:
-    get:
-      description: Gets information on all agents
-      responses:
-        200:
-          description: Successful response
-          schema:
-              type: array
-              items:
-                $ref: '#/definitions/agent-info'       
-  /{agentId}:
+# Collections in 2.0: revision 3c990cdff9ad
+# schema-info
+  /agents/{agentId}/schema:
     parameters:
       - $ref: '#/parameters/agentId'    
     get:
@@ -25,20 +18,10 @@ paths:
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/agent-info'     
-  /{agentId}/{vmId}:
-    parameters:
-      - $ref: '#/parameters/agentId'
-      - $ref: '#/parameters/vmId'    
-    get:
-      description: Gets information for a jvm monitored by an agent
-      responses:
-        200:
-          description: Successful response
-          schema:
-            $ref: '#/definitions/jvm-info'
-
-            
+              type: array
+              items:
+                $ref: '#/definitions/schema-info'  
+# agent-config
   /agents:
     get:
       description: Gets information for all agents
@@ -60,37 +43,7 @@ paths:
           schema:
               type: array
               items:
-                $ref: '#/definitions/agent-info'               
-  /agents/{agentId}/vms:
-    parameters:
-      - $ref: '#/parameters/agentId'   
-    get:
-      description: Gets information for all jvms monitored by an agent
-      responses:
-        200:
-          description: Successful response
-          schema:
-              type: array
-              items:
-                $ref: '#/definitions/jvm-info'
-  /agents/{agentId}/vms/{vmId}:
-    parameters:
-      - $ref: '#/parameters/agentId'
-      - $ref: '#/parameters/vmId'    
-    get:
-      description: Gets information for a jvm monitored by an agent
-      responses:
-        200:
-          description: Successful response
-          schema:
-            $ref: '#/definitions/jvm-info'
-            
-
-# Collections in 2.0: revision 3c990cdff9ad
-
-# schema-info
-# agent-config
-
+                $ref: '#/definitions/agent-info'     
 # host-info
   /agents/{agentId}/host:
     parameters:
@@ -119,6 +72,32 @@ paths:
           schema:
             $ref: '#/definitions/host-cpu-info'
 # memory-stats
+
+# vm-info
+
+  /agents/{agentId}/vms:
+    parameters:
+      - $ref: '#/parameters/agentId'   
+    get:
+      description: Gets information for all jvms monitored by an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/jvm-info'
+  /agents/{agentId}/vms/{vmId}:
+    parameters:
+      - $ref: '#/parameters/agentId'
+      - $ref: '#/parameters/vmId'    
+    get:
+      description: Gets information for a jvm monitored by an agent
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/jvm-info'
 
 # vm-class-stats
 # vm-gc-stats
@@ -202,7 +181,6 @@ paths:
 
 # vm-thread-harvesting TODO: Improve collection schema and function
 
-# vm-info
 
 definitions:
   filters:
@@ -222,6 +200,9 @@ definitions:
       - key
       - comparator
       - value
+      
+  schema-info:
+    type: object
 
   agent-info:
     type: object
