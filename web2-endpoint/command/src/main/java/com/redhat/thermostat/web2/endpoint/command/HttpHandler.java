@@ -36,6 +36,7 @@
 
 package com.redhat.thermostat.web2.endpoint.command;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -44,7 +45,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -74,16 +77,113 @@ public class HttpHandler {
 
         return DocumentResponse.build(documents, request.getElapsed());
     }
+    /**
+     * Temporary function for demonstration purposes
+     */
+    @GET
+    @Path("agents")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getAgents(@QueryParam("count") @DefaultValue("1") String count,
+                            @QueryParam("sort") @DefaultValue("-1") String sort,
+                            @QueryParam("user") String user) {
+        if (!MongoStorage.isConnected()) {
+            return "agents";
+        }
+
+        final int limit = Integer.valueOf(count);
+        final int sortOrder = Integer.valueOf(sort);
+        final String userName = user;
+
+        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
+        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                if (userName != null) {
+                    return MongoStorage.getDatabase().getCollection("agents").find(Filters.eq("tags", userName)).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+                } else {
+                    return MongoStorage.getDatabase().getCollection("agents").find().sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+                }
+
+            }
+        });
+
+        return DocumentResponse.build(documents, request.getElapsed());
+    }
+
+    @GET
+    @Path("agents/{agentId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAgents(@Context HttpServletRequest request,
+                              @PathParam("agentId") String agentId,
+                              @QueryParam("count") @DefaultValue("1") String count,
+                              @QueryParam("sort") @DefaultValue("-1") String sort,
+                              @QueryParam("user") String user) {
+        if (!MongoStorage.isConnected()) {
+            return Response.status(Response.Status.OK).entity("GET " + agentId + " " + count + " " + sort + " " + user).build();
+        }
+
+        Bson filter = Filters.eq("item.agentId", agentId);
+
+        if (user != null) {
+            filter = Filters.and(Filters.eq("tags", user), filter);
+        }
+
+        final int limit = Integer.valueOf(count);
+        final int sortOrder = Integer.valueOf(sort);
+
+        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
+        final Bson finalFilter = filter;
+        FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                return MongoStorage.getDatabase().getCollection("agents").find(finalFilter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+            }
+        });
+
+        return Response.status(Response.Status.OK).entity(DocumentResponse.build(documents, timedRequest.getElapsed())).build();
+    }
+
+    @PUT
+    @Path("agents")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response putAgents(String body,
+                              @Context HttpServletRequest request,
+                              @QueryParam("user") String user) {
+        if (!MongoStorage.isConnected()) {
+            return Response.status(Response.Status.OK).entity("PUT " + user + "\n\n" + body).build();
+        }
+
+        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
+
+
+        /**
+         * TODO: Verify body matches expected schema
+         */
+        String document = "{\"item\":" + body + ",\"tags\":[\"" + user + "\"]}";
+        final Document item = Document.parse(document);
+
+        timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                MongoStorage.getDatabase().getCollection("agents").insertOne(item);
+                return null;
+            }
+        });
+
+        return Response.status(Response.Status.OK).entity("PUT " + "\n\n" + document).build();
+//        return Response.status(Response.Status.OK).build();
+    }
 
     @GET
     @Path("agents/{agentId}/vms/{vmId}/cpu")
     @Produces(MediaType.APPLICATION_JSON)
     public String getVmCpuInfo(@PathParam("agentId") String agentId,
-                                @PathParam("vmId") String vmId,
-                                @QueryParam("count") @DefaultValue("1") String count,
-                                @QueryParam("sort") @DefaultValue("-1") String sort,
-                                @QueryParam("maxTimestamp") String maxTimestamp,
-                                @QueryParam("minTimestamp") String minTimestamp) {
+                               @PathParam("vmId") String vmId,
+                               @QueryParam("count") @DefaultValue("1") String count,
+                               @QueryParam("sort") @DefaultValue("-1") String sort,
+                               @QueryParam("maxTimestamp") String maxTimestamp,
+                               @QueryParam("minTimestamp") String minTimestamp,
+                               @QueryParam("user") String user) {
 
         if (!MongoStorage.isConnected()) {
             return agentId + vmId + count + sort + maxTimestamp + minTimestamp;
@@ -92,6 +192,7 @@ public class HttpHandler {
         final int size = Integer.valueOf(count);
 
         Bson filter = Filters.and(Filters.eq("agentId", agentId), Filters.eq("vmId", vmId));
+
 
         if (maxTimestamp != null) {
             filter = Filters.and(Filters.lte("timeStamp", Long.valueOf(maxTimestamp)), filter);

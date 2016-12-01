@@ -44,6 +44,8 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
@@ -78,7 +80,16 @@ public class WebEndpointCommand extends AbstractCommand {
 
         server = JettyHttpContainerFactory.createServer(baseUri, config, false);
 
-        ServerConnector httpConnector = new ServerConnector(server);
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setSecureScheme("https");
+        httpConfig.setSecurePort(8443);
+        httpConfig.setOutputBufferSize(32768);
+        httpConfig.setRequestHeaderSize(8192);
+        httpConfig.setResponseHeaderSize(8192);
+        httpConfig.setSendServerVersion(true);
+        httpConfig.setSendDateHeader(false);
+
+        ServerConnector httpConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         httpConnector.setHost("localhost");
         httpConnector.setIdleTimeout(30000);
         httpConnector.setPort(port);

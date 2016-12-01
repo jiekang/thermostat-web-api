@@ -13,7 +13,7 @@ paths:
     parameters:
       - $ref: '#/parameters/agentId'    
     get:
-      description: Gets information for an agent
+      description: Gets schema information for agent
       responses:
         200:
           description: Successful response
@@ -74,7 +74,6 @@ paths:
 # memory-stats
 
 # vm-info
-
   /agents/{agentId}/vms:
     parameters:
       - $ref: '#/parameters/agentId'   
@@ -115,22 +114,10 @@ paths:
           schema:
             $ref: '#/definitions/host-cpu-info'
       parameters:
-        - name: count
-          in: query
-          description: Count of media to return.
-          type: integer
-        - name: sort
-          in: query
-          description: Order to sort by (1 or -1).
-          type: integer          
-        - name: max_timestamp
-          in: query
-          description: Return media before this timestamp.
-          type: integer
-        - name: min_timestamp
-          in: query
-          description: Return media after this timestamp.
-          type: integer
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/maxTimestamp'
+        - $ref: '#/parameters/minTimestamp'
     post:
       description: Gets most recent cpu information for the jvm
       responses:
@@ -139,19 +126,9 @@ paths:
           schema:
             $ref: '#/definitions/host-cpu-info'
       parameters:
-        - name: filters
-          in: body
-          description: Key, Comparator, Value trios to filter the data
-          schema:
-            $ref: '#/definitions/filters'
-        - name: count
-          in: query
-          description: Count of media to return.
-          type: integer
-        - name: sort
-          in: query
-          description: Order to sort by (1 or -1).
-          type: integer                 
+        - $ref: '#/parameters/filters'
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
     put:
       description: Adds cpu information for the jvm
       responses:
@@ -206,6 +183,11 @@ definitions:
 
   agent-info:
     type: object
+    properties:
+      tags:
+        type: array
+        items:
+          type: string
     
   host-info:
     type: object
@@ -336,4 +318,30 @@ parameters:
     in: path
     description: The jvm identification number
     type: number
-    required: true    
+    required: true
+  count:
+    name: count
+    in: query
+    description: Count of media to return.
+    type: integer
+  filters:
+    name: filters
+    in: body
+    description: Key, Comparator, Value trios to filter the data
+    schema:
+      $ref: '#/definitions/filters'
+  sort:
+    name: sort
+    in: query
+    description: Order to sort by (1 or -1).
+    type: integer
+  maxTimestamp:  
+    name: max_timestamp
+    in: query
+    description: Return media before this timestamp.
+    type: integer
+  minTimestamp:  
+    name: min_timestamp
+    in: query
+    description: Return media after this timestamp.
+    type: integer
