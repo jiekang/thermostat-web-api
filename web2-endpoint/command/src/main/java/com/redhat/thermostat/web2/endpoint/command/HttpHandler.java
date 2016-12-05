@@ -36,9 +36,7 @@
 
 package com.redhat.thermostat.web2.endpoint.command;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
