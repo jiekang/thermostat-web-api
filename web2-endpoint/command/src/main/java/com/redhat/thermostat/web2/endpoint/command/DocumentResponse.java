@@ -22,15 +22,22 @@ public class DocumentResponse {
      * }
      */
 
-    public static String build(FindIterable<Document> items, long elapsed) {
+    public static String build(FindIterable<Document> documents, long elapsed) {
         StringBuilder s = new StringBuilder();
         int i = 0;
 
         s.append("{\"response\" : {");
-        for (Document item : items) {
-            s.append("\"" + i + "\" : " + item.toJson() + ",");
+        for (Document document : documents) {
+            String response;
+            if (document.containsKey("tags")) {
+                response = ((Document)document.get("item")).toJson();
+            } else {
+                response = document.toJson();
+            }
+            s.append("\"" + i + "\" : " + response + ",");
             i++;
         }
+
         if (i != 0) {
             s.deleteCharAt(s.length() - 1);
         }

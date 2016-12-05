@@ -36,6 +36,8 @@
 
 package com.redhat.thermostat.web2.endpoint.command;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -48,6 +50,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -57,6 +60,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 
 @Path("")
+@RolesAllowed("user")
 public class HttpHandler {
 
     @GET
@@ -67,15 +71,15 @@ public class HttpHandler {
             return "vm-cpu";
         }
 
-        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
-        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
+        FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
             public FindIterable<Document> run() {
                 return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find().sort(new BasicDBObject("_id", -1));
             }
         });
 
-        return DocumentResponse.build(documents, request.getElapsed());
+        return DocumentResponse.build(documents, timedRequest.getElapsed());
     }
     /**
      * Temporary function for demonstration purposes
@@ -83,53 +87,46 @@ public class HttpHandler {
     @GET
     @Path("agents")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getAgents(@QueryParam("count") @DefaultValue("1") String count,
-                            @QueryParam("sort") @DefaultValue("-1") String sort,
-                            @QueryParam("user") String user) {
+    public String getAgents(@Context SecurityContext securityContext,
+                            @QueryParam("count") @DefaultValue("1") String count,
+                            @QueryParam("sort") @DefaultValue("-1") String sort) {
         if (!MongoStorage.isConnected()) {
             return "agents";
         }
 
+
         final int limit = Integer.valueOf(count);
         final int sortOrder = Integer.valueOf(sort);
-        final String userName = user;
+        final String userName = securityContext.getUserPrincipal().getName();
 
-        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
-        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
+        FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
             public FindIterable<Document> run() {
-                if (userName != null) {
-                    return MongoStorage.getDatabase().getCollection("agents").find(Filters.eq("tags", userName)).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
-                } else {
-                    return MongoStorage.getDatabase().getCollection("agents").find().sort(new BasicDBObject("_id", sortOrder)).limit(limit);
-                }
-
+            return MongoStorage.getDatabase().getCollection("agents").find(Filters.eq("tags", userName)).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
             }
         });
 
-        return DocumentResponse.build(documents, request.getElapsed());
+        return DocumentResponse.build(documents, timedRequest.getElapsed());
     }
 
     @GET
     @Path("agents/{agentId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAgents(@Context HttpServletRequest request,
+    public Response getAgent(@Context SecurityContext securityContext,
                               @PathParam("agentId") String agentId,
                               @QueryParam("count") @DefaultValue("1") String count,
-                              @QueryParam("sort") @DefaultValue("-1") String sort,
-                              @QueryParam("user") String user) {
+                              @QueryParam("sort") @DefaultValue("-1") String sort) {
         if (!MongoStorage.isConnected()) {
-            return Response.status(Response.Status.OK).entity("GET " + agentId + " " + count + " " + sort + " " + user).build();
-        }
-
-        Bson filter = Filters.eq("item.agentId", agentId);
-
-        if (user != null) {
-            filter = Filters.and(Filters.eq("tags", user), filter);
+            return Response.status(Response.Status.OK).entity("GET " + agentId + " " + count + " " + sort + " " + securityContext.getUserPrincipal().getName()).build();
         }
 
         final int limit = Integer.valueOf(count);
         final int sortOrder = Integer.valueOf(sort);
+        final String userName = securityContext.getUserPrincipal().getName();
+
+        Bson filter = Filters.eq("item.agentId", agentId);
+        filter = Filters.and(Filters.eq("tags", userName), filter);
 
         TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
         final Bson finalFilter = filter;
@@ -146,20 +143,18 @@ public class HttpHandler {
     @PUT
     @Path("agents")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response putAgents(String body,
-                              @Context HttpServletRequest request,
-                              @QueryParam("user") String user) {
+    public Response putAgent(String body,
+                              @Context SecurityContext context) {
         if (!MongoStorage.isConnected()) {
-            return Response.status(Response.Status.OK).entity("PUT " + user + "\n\n" + body).build();
+            return Response.status(Response.Status.OK).entity("PUT " + context.getUserPrincipal().getName() + "\n\n" + body).build();
         }
 
         TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
 
-
         /**
          * TODO: Verify body matches expected schema
          */
-        String document = "{\"item\":" + body + ",\"tags\":[\"" + user + "\"]}";
+        String document = "{\"item\":" + body + ",\"tags\":[\"agent\", \"" + context.getUserPrincipal().getName() + "\"]}";
         final Document item = Document.parse(document);
 
         timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
@@ -171,7 +166,6 @@ public class HttpHandler {
         });
 
         return Response.status(Response.Status.OK).entity("PUT " + "\n\n" + document).build();
-//        return Response.status(Response.Status.OK).build();
     }
 
     @GET
@@ -182,8 +176,7 @@ public class HttpHandler {
                                @QueryParam("count") @DefaultValue("1") String count,
                                @QueryParam("sort") @DefaultValue("-1") String sort,
                                @QueryParam("maxTimestamp") String maxTimestamp,
-                               @QueryParam("minTimestamp") String minTimestamp,
-                               @QueryParam("user") String user) {
+                               @QueryParam("minTimestamp") String minTimestamp) {
 
         if (!MongoStorage.isConnected()) {
             return agentId + vmId + count + sort + maxTimestamp + minTimestamp;

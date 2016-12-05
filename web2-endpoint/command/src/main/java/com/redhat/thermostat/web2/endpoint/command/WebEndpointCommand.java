@@ -50,11 +50,13 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 import com.redhat.thermostat.common.cli.AbstractCommand;
 import com.redhat.thermostat.common.cli.Command;
 import com.redhat.thermostat.common.cli.CommandContext;
 import com.redhat.thermostat.common.cli.CommandException;
+import com.redhat.thermostat.web2.endpoint.security.BasicAuthFilter;
 
 @Component
 @Service(Command.class)
@@ -77,17 +79,19 @@ public class WebEndpointCommand extends AbstractCommand {
         URI baseUri = UriBuilder.fromUri("http://localhost").port(8080).build();
         ResourceConfig config = new ResourceConfig();
         config.register(new HttpHandler());
+        config.register(new BasicAuthFilter());
+        config.register(new RolesAllowedDynamicFeature());
 
         server = JettyHttpContainerFactory.createServer(baseUri, config, false);
 
         HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setSecureScheme("https");
-        httpConfig.setSecurePort(8443);
-        httpConfig.setOutputBufferSize(32768);
-        httpConfig.setRequestHeaderSize(8192);
-        httpConfig.setResponseHeaderSize(8192);
-        httpConfig.setSendServerVersion(true);
-        httpConfig.setSendDateHeader(false);
+//        httpConfig.setSecureScheme("https");
+//        httpConfig.setSecurePort(8443);
+//        httpConfig.setOutputBufferSize(32768);
+//        httpConfig.setRequestHeaderSize(8192);
+//        httpConfig.setResponseHeaderSize(8192);
+//        httpConfig.setSendServerVersion(true);
+//        httpConfig.setSendDateHeader(false);
 
         ServerConnector httpConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         httpConnector.setHost("localhost");
