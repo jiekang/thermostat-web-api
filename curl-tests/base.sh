@@ -1,18 +1,34 @@
 #!/bin/bash
 
-# $1 url
+# $1 user
+# $2 password
+# $3 url
 get() {
-  curl -s -X GET "$1"
+  curl -s -X GET --user $1:$2 "$3"
 }
 
-# $1 url
-# $2 body
+# $1 user
+# $2 password
+# $3 url
+# $4 body
 post() {
-  curl -s -X POST -d "$2" "$1"
+  curl -s -X POST --user $1:$2 -d "$4" "$3"
 }
 
-# $1 url
-# $2 body
+# $1 user
+# $2 password
+# $3 url
+# $4 body
 put() {
-  curl -s -X PUT -d "$2" "$1"
+  curl -s -X PUT --user $1:$2 -d "$4" "$3"
+}
+
+check() {
+  if [ "$1" == "$2" ] ; then
+    echo "Pass: $3"
+    exit 0;
+  else
+    echo "Fail: $3" 
+    exit 1;
+  fi 
 }

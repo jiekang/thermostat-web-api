@@ -57,6 +57,7 @@ import com.redhat.thermostat.common.cli.Command;
 import com.redhat.thermostat.common.cli.CommandContext;
 import com.redhat.thermostat.common.cli.CommandException;
 import com.redhat.thermostat.web2.endpoint.security.BasicAuthFilter;
+import com.redhat.thermostat.web2.endpoint.web.handler.HttpHandler;
 
 @Component
 @Service(Command.class)

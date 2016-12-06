@@ -65,8 +65,7 @@
                         <!-- need to declare bundles explicitly since the automatisms fail if an embedded jetty
                              -->
                         <Private-Package>
-                            com.redhat.thermostat.web2.endpoint.command,
-                            com.redhat.thermostat.web2.endpoint.security,
+                            com.redhat.thermostat.web2.endpoint.*,
                         </Private-Package>
                         <_nouses>true</_nouses>
                     </instructions>

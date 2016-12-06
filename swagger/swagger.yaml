@@ -3,41 +3,39 @@ swagger: '2.0'
 info:
   version: "0.0.1"
   title: Thermostat Web API
+  license:
+    name: GPL v2 with Classpath Exception
+    url: http://www.gnu.org/licenses
 
-# Describe your paths here
 
+consumes: ['application/json']
+produces: ['application/json', 'text/html; charset=utf-8']
 paths:
 # Collections in 2.0: revision 3c990cdff9ad
 # schema-info
   /agents/{agentId}/schema:
     parameters:
-      - $ref: '#/parameters/agentId'    
+      - $ref: '#/parameters/agent-id'    
     get:
       description: Gets schema information for agent
       responses:
+        401:
+          $ref: '#/responses/unauthorized'
         200:
           description: Successful response
           schema:
               type: array
               items:
-                $ref: '#/definitions/schema-info'  
+                $ref: '#/definitions/schema-info'
 # agent-config
-  /agents:
-    get:
-      description: Gets information for all agents
-      responses:
-        200:
-          description: Successful response
-          schema:
-              type: array
-              items:
-                $ref: '#/definitions/agent-info'
   /agents/{agentId}:
     parameters:
-      - $ref: '#/parameters/agentId'    
+      - $ref: '#/parameters/agent-id'    
     get:
-      description: Gets information for an agent
+      description: Gets information for an agent. Use 'all' as the agentId
       responses:
+        401:
+          $ref: '#/responses/unauthorized'
         200:
           description: Successful response
           schema:
@@ -47,10 +45,12 @@ paths:
 # host-info
   /agents/{agentId}/host:
     parameters:
-      - $ref: '#/parameters/agentId'
+      - $ref: '#/parameters/agent-id'
     get:
       description: Gets information for the host
       responses:
+        401:
+          $ref: '#/responses/unauthorized'      
         200:
           description: Successful response
           schema:
@@ -58,15 +58,30 @@ paths:
 # network-info
 # backend-info
 
+#
+# agents -> host
+# agents -> jvms
+
+# can restrict at each level (easier to do restrict to all jvms under specific host, etc.)
+# agents -> host -> jvms
+
+# Tree-based restriction (file-system-like)
+# /*
+# /agents/agentid/*
+# agents -> host -> info
+#
+
 # numa-host-info
 # numa-stat
 # cpu-stats
   /agents/{agentId}/host/cpu:
     parameters:
-      - $ref: '#/parameters/agentId'
+      - $ref: '#/parameters/agent-id'
     get:
       description: Gets cpu information for the host
       responses:
+        401:
+          $ref: '#/responses/unauthorized'      
         200:
           description: Successful response
           schema:
@@ -74,29 +89,19 @@ paths:
 # memory-stats
 
 # vm-info
-  /agents/{agentId}/vms:
+  /agents/{agentId}/host/vms/{vmId}:
     parameters:
-      - $ref: '#/parameters/agentId'   
-    get:
-      description: Gets information for all jvms monitored by an agent
-      responses:
-        200:
-          description: Successful response
-          schema:
-              type: array
-              items:
-                $ref: '#/definitions/jvm-info'
-  /agents/{agentId}/vms/{vmId}:
-    parameters:
-      - $ref: '#/parameters/agentId'
-      - $ref: '#/parameters/vmId'    
+      - $ref: '#/parameters/agent-id'
+      - $ref: '#/parameters/vm-id'    
     get:
       description: Gets information for a jvm monitored by an agent
       responses:
+        401:
+          $ref: '#/responses/unauthorized'      
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/jvm-info'
+            $ref: '#/definitions/vm-info'
 
 # vm-class-stats
 # vm-gc-stats
@@ -104,38 +109,45 @@ paths:
 # vm-cpu-stats
   /agents/{agentId}/vms/{vmId}/cpu:
     parameters:
-      - $ref: '#/parameters/agentId'
-      - $ref: '#/parameters/vmId'
+      - $ref: '#/parameters/agent-id'
+      - $ref: '#/parameters/vm-id'
     get:
       description: Gets most recent cpu information for the jvm
-      responses:
-        200:
-          description: Successful response
-          schema:
-            $ref: '#/definitions/host-cpu-info'
       parameters:
         - $ref: '#/parameters/count'
         - $ref: '#/parameters/sort'
         - $ref: '#/parameters/maxTimestamp'
         - $ref: '#/parameters/minTimestamp'
-    post:
-      description: Gets most recent cpu information for the jvm
       responses:
+        401:
+          $ref: '#/responses/unauthorized'      
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/host-cpu-info'
+            $ref: '#/definitions/vm-cpu-info'
+    post:
+      description: Gets most recent cpu information for the jvm
       parameters:
         - $ref: '#/parameters/filters'
         - $ref: '#/parameters/count'
         - $ref: '#/parameters/sort'
-    put:
-      description: Adds cpu information for the jvm
       responses:
+        401:
+          $ref: '#/responses/unauthorized'      
         200:
           description: Successful response
           schema:
-            $ref: '#/definitions/host-cpu-info'
+            $ref: '#/definitions/vm-cpu-info'
+    put:
+      description: Adds cpu information for the jvm
+      parameters:
+        - $ref: '#/parameters/vm-cpu-info'
+        - $ref: '#/parameters/tags'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: Successful response
 
 # vm-memory-stats
 # vm-io-stats
@@ -180,145 +192,46 @@ definitions:
       
   schema-info:
     type: object
-
   agent-info:
     type: object
-    properties:
-      tags:
-        type: array
-        items:
-          type: string
-    
+
   host-info:
     type: object
   host-cpu-info:
     type: object
     
-  jvm-info:
+  vm-info:
     type: object
-    properties:
-      _id:
-        type: object
-        properties:
-          "$oid":
-            type: string
-        required:
-        - "$oid"
-      agentId:
-        type: string
-      vmId:
-        type: string
-      vmPid:
-        type: integer
-      startTimeStamp:
-        type: object
-        properties:
-          "$numberLong":
-            type: string
-        required:
-        - "$numberLong"
-      stopTimeStamp:
-        type: object
-        properties:
-          "$numberLong":
-            type: string
-        required:
-        - "$numberLong"
-      javaVersion:
-        type: string
-      javaHome:
-        type: string
-      mainClass:
-        type: string
-      javaCommandLine:
-        type: string
-      vmName:
-        type: string
-      vmArguments:
-        type: string
-      vmInfo:
-        type: string
-      vmVersion:
-        type: string
-      propertiesAsArray:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-          required:
-          - key
-          - value
-      environmentAsArray:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-          required:
-          - key
-          - value
-      loadedNativeLibraries:
-        type: array
-        items:
-          type: object
-          properties:
-            key:
-              type: string
-            value:
-              type: string
-          required:
-          - key
-          - value
-      uid:
-        type: object
-        properties:
-          "$numberLong":
-            type: string
-        required:
-        - "$numberLong"
-      username:
-        type: string
-    required:
-      - _id
-      - agentId
-      - vmId
-      - vmPid
-      - startTimeStamp
-      - stopTimeStamp
-      - javaVersion
-      - javaHome
-      - mainClass
-      - javaCommandLine
-      - vmName
-      - vmArguments
-      - vmInfo
-      - vmVersion
-      - propertiesAsArray
-      - environmentAsArray
-      - loadedNativeLibraries
-      - uid
-      - username
-
+  vm-cpu-info:
+    type: object
+    
 parameters:
-  agentId:
+  agent-id:
     name: agentId
     in: path
     description: The agent identification number
     type: number
     required: true
-  vmId:
+  vm-id:
     name: vmId
     in: path
     description: The jvm identification number
     type: number
     required: true
+
+  vm-cpu-info:
+    name: vmCpuInfo
+    in: body
+    description: The jvm CPU information
+    required: true
+    schema:
+      $ref: '#/definitions/vm-cpu-info'
+    
+  tags:
+    name: tags
+    in: query
+    description: CSV of tags
+    type: string
   count:
     name: count
     in: query
@@ -345,3 +258,7 @@ parameters:
     in: query
     description: Return media after this timestamp.
     type: integer
+    
+responses:
+  unauthorized:
+    description: Access prohibited.

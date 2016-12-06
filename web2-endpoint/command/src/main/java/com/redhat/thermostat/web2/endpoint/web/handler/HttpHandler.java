@@ -34,12 +34,13 @@
  * to do so, delete this exception statement from your version.
  */
 
-package com.redhat.thermostat.web2.endpoint.command;
+package com.redhat.thermostat.web2.endpoint.web.handler;
+
+import java.util.Arrays;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -55,58 +56,15 @@ import org.bson.conversions.Bson;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.model.Filters;
+import com.redhat.thermostat.web2.endpoint.command.MongoStorage;
+import com.redhat.thermostat.web2.endpoint.command.TimedRequest;
+import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
+import com.redhat.thermostat.web2.endpoint.web.json.DocumentBuilder;
+import com.redhat.thermostat.web2.endpoint.web.response.ResponseBuilder;
 
 @Path("")
 @RolesAllowed("user")
 public class HttpHandler {
-
-    @GET
-    @Path("vm-cpu")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getAllVmCpuInfo() {
-        if (!MongoStorage.isConnected()) {
-            return "vm-cpu";
-        }
-
-        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
-        FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
-            @Override
-            public FindIterable<Document> run() {
-                return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find().sort(new BasicDBObject("_id", -1));
-            }
-        });
-
-        return DocumentResponse.build(documents, timedRequest.getElapsed());
-    }
-    /**
-     * Temporary function for demonstration purposes
-     */
-    @GET
-    @Path("agents")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getAgents(@Context SecurityContext securityContext,
-                            @QueryParam("count") @DefaultValue("1") String count,
-                            @QueryParam("sort") @DefaultValue("-1") String sort) {
-        if (!MongoStorage.isConnected()) {
-            return "agents";
-        }
-
-
-        final int limit = Integer.valueOf(count);
-        final int sortOrder = Integer.valueOf(sort);
-        final String userName = securityContext.getUserPrincipal().getName();
-
-        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
-        FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
-            @Override
-            public FindIterable<Document> run() {
-            return MongoStorage.getDatabase().getCollection("agents").find(Filters.eq("tags", userName)).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
-            }
-        });
-
-        return DocumentResponse.build(documents, timedRequest.getElapsed());
-    }
 
     @GET
     @Path("agents/{agentId}")
@@ -123,23 +81,21 @@ public class HttpHandler {
         final int sortOrder = Integer.valueOf(sort);
         final String userName = securityContext.getUserPrincipal().getName();
 
-        Bson filter = Filters.eq("item.agentId", agentId);
-        filter = Filters.and(Filters.eq("tags", userName), filter);
+        final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName));
 
         TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
-        final Bson finalFilter = filter;
         FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
             public FindIterable<Document> run() {
-                return MongoStorage.getDatabase().getCollection("agents").find(finalFilter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+                return MongoStorage.getDatabase().getCollection("agents").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
             }
         });
 
-        return Response.status(Response.Status.OK).entity(DocumentResponse.build(documents, timedRequest.getElapsed())).build();
+        return Response.status(Response.Status.OK).entity(ResponseBuilder.buildJsonFromDocuments(documents, timedRequest.getElapsed())).build();
     }
 
     @PUT
-    @Path("agents")
+    @Path("agents/{agentId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response putAgent(String body,
                               @Context SecurityContext context) {
@@ -151,9 +107,9 @@ public class HttpHandler {
 
         /**
          * TODO: Verify body matches expected schema
+         * TODO: Clean up insertion of tags into JSON body
          */
-        String document = "{\"item\":" + body + ",\"tags\":[\"agent\", \"" + context.getUserPrincipal().getName() + "\"]}";
-        final Document item = Document.parse(document);
+        final Document item = Document.parse(DocumentBuilder.addTags(body, context.getUserPrincipal().getName()));
 
         timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
@@ -163,74 +119,38 @@ public class HttpHandler {
             }
         });
 
-        return Response.status(Response.Status.OK).entity("PUT " + "\n\n" + document).build();
+        return Response.status(Response.Status.OK).entity("PUT successful").build();
     }
 
     @GET
-    @Path("agents/{agentId}/vms/{vmId}/cpu")
+    @Path("agents/{agentId}/host/cpu")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getVmCpuInfo(@PathParam("agentId") String agentId,
-                               @PathParam("vmId") String vmId,
+    public Response getVmCpuInfo(@Context SecurityContext securityContext,
+                               @PathParam("agentId") String agentId,
                                @QueryParam("count") @DefaultValue("1") String count,
                                @QueryParam("sort") @DefaultValue("-1") String sort,
                                @QueryParam("maxTimestamp") String maxTimestamp,
                                @QueryParam("minTimestamp") String minTimestamp) {
 
         if (!MongoStorage.isConnected()) {
-            return agentId + vmId + count + sort + maxTimestamp + minTimestamp;
+            return Response.status(Response.Status.OK).entity(agentId + count + sort + maxTimestamp + minTimestamp).build();
         }
 
         final int size = Integer.valueOf(count);
 
-        Bson filter = Filters.and(Filters.eq("agentId", agentId), Filters.eq("vmId", vmId));
-
-
-        if (maxTimestamp != null) {
-            filter = Filters.and(Filters.lte("timeStamp", Long.valueOf(maxTimestamp)), filter);
-        }
-        if (minTimestamp != null) {
-            filter = Filters.and(Filters.gte("timeStamp", Long.valueOf(minTimestamp)), filter);
-        }
+        final String userName = securityContext.getUserPrincipal().getName();
+        final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName), maxTimestamp, minTimestamp);
 
         final int sortOrder = Integer.valueOf(sort);
 
         TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
-        final Bson finalFilter = filter;
         FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override
             public FindIterable<Document> run() {
-                return MongoStorage.getDatabase().getCollection("vm-cpu-stats").find(finalFilter).sort(new BasicDBObject("_id", sortOrder)).limit(size);
+                return MongoStorage.getDatabase().getCollection("cpu-stats").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(size);
             }
         });
 
-        return DocumentResponse.build(documents, request.getElapsed());
-    }
-
-    @POST
-    @Path("agents/{agentId}/vms/{vmId}/cpu")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String postVmCpuInfo(String body,
-                                @PathParam("agentId") String agentId,
-                                @PathParam("vmId") String vmId,
-                                @QueryParam("count") @DefaultValue("1") String count,
-                                @QueryParam("sort") @DefaultValue("-1") String sort) {
-        if (!MongoStorage.isConnected()) {
-            return body + agentId + vmId + count + sort;
-        }
-        return "POST " + agentId + " " + vmId + "\n\n" + body;
-    }
-
-    @PUT
-    @Path("agents/{agentId}/vms/{vmId}/cpu")
-    @Produces(MediaType.TEXT_HTML)
-    public String putVmCpuInfo(String body,
-                               @PathParam("agentId") String agentId,
-                               @PathParam("vmId") String vmId,
-                               @QueryParam("count") @DefaultValue("1") String count,
-                               @QueryParam("sort") @DefaultValue("-1") String sort) {
-        if (!MongoStorage.isConnected()) {
-            return body + agentId + vmId + count + sort;
-        }
-        return "PUT " + agentId + " " + vmId + "\n\n" + body;
+        return Response.status(Response.Status.OK).entity(ResponseBuilder.buildJsonFromDocuments(documents, request.getElapsed())).build();
     }
 }
