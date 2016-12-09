@@ -10,7 +10,7 @@ import javax.ws.rs.core.SecurityContext;
 public interface StorageHandler {
     Response getAgent(@Context SecurityContext securityContext,
                       @PathParam("agentId") String agentId,
-                      @QueryParam("count") @DefaultValue("1") String count,
+                      @QueryParam("size") @DefaultValue("1") String count,
                       @QueryParam("sort") @DefaultValue("-1") String sort,
                       @QueryParam("cursor") @DefaultValue("-1") String cursor);
 

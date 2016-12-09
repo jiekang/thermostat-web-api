@@ -6,6 +6,6 @@ public class CursorId {
 
     public CursorId(String cursor) {
         this.skip = Integer.valueOf(cursor.substring(0, cursor.indexOf("-")));
-        this.id = cursor.substring(cursor.indexOf("-"));
+        this.id = cursor.substring(cursor.indexOf("-") + 1);
     }
 }

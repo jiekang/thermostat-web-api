@@ -77,7 +77,7 @@ public class HttpHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAgent(@Context SecurityContext securityContext,
                              @PathParam("agentId") String agentId,
-                             @QueryParam("count") @DefaultValue("1") String count,
+                             @QueryParam("size") @DefaultValue("1") String count,
                              @QueryParam("sort") @DefaultValue("-1") String sort,
                              @QueryParam("cursor") @DefaultValue("-1") String cursor) {
         return handler.getAgent(securityContext, agentId, count, sort, cursor);
@@ -116,7 +116,7 @@ public class HttpHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVmCpuInfo(@Context SecurityContext securityContext,
                                @PathParam("agentId") String agentId,
-                               @QueryParam("count") @DefaultValue("1") String count,
+                               @QueryParam("size") @DefaultValue("1") String count,
                                @QueryParam("sort") @DefaultValue("-1") String sort,
                                @QueryParam("maxTimestamp") String maxTimestamp,
                                @QueryParam("minTimestamp") String minTimestamp) {

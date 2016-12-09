@@ -24,25 +24,25 @@ import com.redhat.thermostat.web2.endpoint.web.response.ResponseBuilder;
 
 public class MongoHandler implements StorageHandler {
 
+    private final int MAX_MONGO_DOCUMENTS = 5000;
+
     @Override
     public Response getAgent(@Context SecurityContext securityContext,
                              @PathParam("agentId") String agentId,
-                             @QueryParam("count") @DefaultValue("1") String count,
+                             @QueryParam("size") @DefaultValue("1") String count,
                              @QueryParam("sort") @DefaultValue("-1") String sort,
                              @QueryParam("cursor") @DefaultValue("-1") String cursor) {
         if (!MongoStorage.isConnected()) {
             return Response.status(Response.Status.OK).entity("GET " + agentId + " " + count + " " + sort + " " + securityContext.getUserPrincipal().getName()).build();
         }
 
-        final int limit = Integer.valueOf(count);
+        final int limit = Math.min(Integer.valueOf(count), MAX_MONGO_DOCUMENTS);
         final int sortOrder = Integer.valueOf(sort);
         final String userName = securityContext.getUserPrincipal().getName();
         final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName));
 
         final StringBuilder prevCursor = new StringBuilder();
         final StringBuilder nextCursor = new StringBuilder();
-
-        final CursorId cursorId = new CursorId(cursor);
 
         TimedRequest<FindIterable<Document>> timedRequest;
 
@@ -55,9 +55,9 @@ public class MongoHandler implements StorageHandler {
             };
 
             final long size = MongoStorage.getDatabase().getCollection("agents").count(filter);
-            timedRequest = handleNoCursor(userName,
-                    limit, size, query, nextCursor);
+            timedRequest = handleNoCursor(userName, limit, size, query, nextCursor);
         } else if (CursorStore.isValid(userName, cursor)) {
+            final CursorId cursorId = new CursorId(cursor);
             timedRequest = handleCursor(cursorId.skip, cursorId.id, userName, nextCursor, prevCursor);
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
@@ -77,7 +77,7 @@ public class MongoHandler implements StorageHandler {
             @Override
             public FindIterable<Document> run() {
                 if (count > limit) {
-                    MongoCursor cursor = new MongoCursor(limit) {
+                    MongoCursor cursor = new MongoCursor(count, limit) {
                         @Override
                         public FindIterable<Document> run(int skip) {
                             return  query.run().skip(skip);
@@ -85,7 +85,7 @@ public class MongoHandler implements StorageHandler {
                     };
                     String id = CursorStore.addCursor(userName, cursor);
 
-                    nextCursor.append(cursor.limit  + "-" + id);
+                    nextCursor.append(limit  + "-" + id);
 
                 }
                 return query.run();
@@ -100,8 +100,14 @@ public class MongoHandler implements StorageHandler {
                                                               final StringBuilder prevCursor) {
         final MongoCursor cursorRequest = CursorStore.getCursor(userName, id);
 
-        nextCursor.append((skip + cursorRequest.limit) + "-" + id);
-        prevCursor.append((skip - cursorRequest.limit) + "-" + id);
+        int next = skip + cursorRequest.limit;
+        if (next < cursorRequest.size) {
+            nextCursor.append(next + "-" + id);
+        }
+        int prev = skip - cursorRequest.limit;
+        if (prev > -1) {
+            prevCursor.append(prev + "-" + id);
+        }
 
         return new TimedRequest<>(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
             @Override

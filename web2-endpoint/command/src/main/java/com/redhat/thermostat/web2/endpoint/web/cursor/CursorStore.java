@@ -39,6 +39,6 @@ public class CursorStore {
             return false;
         }
 
-        return userMap.containsKey(user) && userMap.get(user).containsKey(cursor.substring(cursor.indexOf("-")));
+        return userMap.containsKey(user) && userMap.get(user).containsKey(cursor.substring(cursor.indexOf("-") + 1));
     }
 }
