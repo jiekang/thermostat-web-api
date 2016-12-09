@@ -11,52 +11,6 @@ info:
 consumes: ['application/json']
 produces: ['application/json', 'text/html; charset=utf-8']
 paths:
-# Collections in 2.0: revision 3c990cdff9ad
-# schema-info
-  /agents/{agentId}/schema:
-    parameters:
-      - $ref: '#/parameters/agent-id'    
-    get:
-      description: Gets schema information for agent
-      responses:
-        401:
-          $ref: '#/responses/unauthorized'
-        200:
-          description: Successful response
-          schema:
-              type: array
-              items:
-                $ref: '#/definitions/schema-info'
-# agent-config
-  /agents/{agentId}:
-    parameters:
-      - $ref: '#/parameters/agent-id'    
-    get:
-      description: Gets information for an agent. Use 'all' as the agentId
-      responses:
-        401:
-          $ref: '#/responses/unauthorized'
-        200:
-          description: Successful response
-          schema:
-              type: array
-              items:
-                $ref: '#/definitions/agent-info'     
-# host-info
-  /agents/{agentId}/host:
-    parameters:
-      - $ref: '#/parameters/agent-id'
-    get:
-      description: Gets information for the host
-      responses:
-        401:
-          $ref: '#/responses/unauthorized'      
-        200:
-          description: Successful response
-          schema:
-            $ref: '#/definitions/host-info'
-# network-info
-# backend-info
 
 #
 # agents -> host
@@ -71,8 +25,151 @@ paths:
 # agents -> host -> info
 #
 
+# Collections in 2.0: revision 3c990cdff9ad
+
+# schema-info
+  /schema:
+    get:
+      description: Gets schema information for the storage
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'
+        200:
+          description: OK
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/schema-info'
+    put:
+      description: Adds or updates schema information for the storage
+      parameters:
+        - $ref: '#/parameters/schema-info'      
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'
+        200:
+          description: OK
+    delete:
+      description: Deletes all schema information
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+# agent-config
+  /agents/{agentId}:
+    parameters:
+      - $ref: '#/parameters/agent-id'    
+    get:
+      description: Gets information for an agent. Use 'all' as the agentId to query all agents
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'
+        200:
+          description: OK
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/agent-info'
+    put:
+      description: Adds or updates information for the agent
+      parameters:
+        - $ref: '#/parameters/agent-info'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'
+        200:
+          description: OK
+    delete:
+      description: Deletes information for the agent
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+# backend-info    
+  /agents/{agentId}/backend:
+    parameters:
+      - $ref: '#/parameters/agent-id'    
+    get:
+      description: Gets backend information for an agent.
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'
+        200:
+          description: OK
+          schema:
+              type: array
+              items:
+                $ref: '#/definitions/backend-info'
+    put:
+      description: Adds or updates backend information for the agent
+      parameters:
+        - $ref: '#/parameters/backend-info'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'
+        200:
+          description: OK
+    delete:
+      description: Deletes backend information for the agent
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+# host-info
+  /agents/{agentId}/host:
+    parameters:
+      - $ref: '#/parameters/agent-id'
+    get:
+      description: Gets information for the host machine monitored by the agent
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/host-info'
+    put:
+      description: Adds or updates information for the host machine monitored by the agent
+      parameters:
+        - $ref: '#/parameters/host-info'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+# network-info
+  /agents/{agentId}/host/network:
+    parameters:
+      - $ref: '#/parameters/agent-id'
+    get:
+      description: Gets network information for the host machine
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/network-info'
+    put:
+      description: Adds or updates network information for the host machine
+      parameters:
+        - $ref: '#/parameters/network-info'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK  
+    
+
+
+
+
 # numa-host-info
 # numa-stat
+
 # cpu-stats
   /agents/{agentId}/host/cpu:
     parameters:
@@ -83,9 +180,18 @@ paths:
         401:
           $ref: '#/responses/unauthorized'      
         200:
-          description: Successful response
+          description: OK
           schema:
             $ref: '#/definitions/host-cpu-info'
+    put:
+      description: Adds or updates cpu information for the host machine
+      parameters:
+        - $ref: '#/parameters/network-info'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK  
 # memory-stats
 
 # vm-info
@@ -99,7 +205,7 @@ paths:
         401:
           $ref: '#/responses/unauthorized'      
         200:
-          description: Successful response
+          description: OK
           schema:
             $ref: '#/definitions/vm-info'
 
@@ -122,7 +228,7 @@ paths:
         401:
           $ref: '#/responses/unauthorized'      
         200:
-          description: Successful response
+          description: OK
           schema:
             $ref: '#/definitions/vm-cpu-info'
     post:
@@ -135,7 +241,7 @@ paths:
         401:
           $ref: '#/responses/unauthorized'      
         200:
-          description: Successful response
+          description: OK
           schema:
             $ref: '#/definitions/vm-cpu-info'
     put:
@@ -147,7 +253,7 @@ paths:
         401:
           $ref: '#/responses/unauthorized'      
         200:
-          description: Successful response
+          description: OK
 
 # vm-memory-stats
 # vm-io-stats
@@ -194,9 +300,14 @@ definitions:
     type: object
   agent-info:
     type: object
-
+  backend-info:
+    type: object
+    
   host-info:
     type: object
+  network-info:
+    type: object
+    
   host-cpu-info:
     type: object
     
@@ -218,7 +329,42 @@ parameters:
     description: The jvm identification number
     type: number
     required: true
-
+  schema-info:
+    name: schemaInfo
+    in: body
+    description: The agent's schema information
+    required: true
+    schema:
+      $ref: '#/definitions/schema-info'
+  agent-info:
+    name: agentInfo
+    in: body
+    description: The agent information
+    required: true
+    schema:
+      $ref: '#/definitions/agent-info'
+  backend-info:
+    name: backendInfo
+    in: body
+    description: The backends registered for an agent
+    required: true
+    schema:
+      $ref: '#/definitions/backend-info'      
+  host-info:
+    name: hostInfo
+    in: body
+    description: The host information
+    required: true
+    schema:
+      $ref: '#/definitions/host-info'
+  network-info:
+    name: networkInfo
+    in: body
+    description: The host's network information
+    required: true
+    schema:
+      $ref: '#/definitions/network-info'
+  
   vm-cpu-info:
     name: vmCpuInfo
     in: body
