@@ -22,7 +22,34 @@ public class ResponseBuilder {
      * }
      */
 
-    public static String buildJsonFromDocuments(FindIterable<Document> documents, long elapsed) {
+    public static String buildJsonResponse(FindIterable<Document> documents, long elapsed) {
+        StringBuilder s = new StringBuilder();
+
+        s.append(buildJsonDocuments(documents));
+        s.append("},\"time\" : " + elapsed + "}");
+
+        return s.toString();
+    }
+
+    public static String buildJsonResponse(FindIterable<Document> documents, long elapsed, String prevCursor, String nextCursor) {
+        StringBuilder s = new StringBuilder();
+
+        s.append(buildJsonDocuments(documents));
+        s.append(buildKeyAddition("time", "" + elapsed));
+
+        if (prevCursor.length() > 0) {
+            s.append(buildKeyAddition("prevCursor", prevCursor));
+        }
+        if (nextCursor.length() > 0) {
+            s.append(buildKeyAddition("nextCursor", nextCursor));
+        }
+
+        s.append("}");
+
+        return s.toString();
+    }
+
+    private static String buildJsonDocuments(FindIterable<Document> documents) {
         StringBuilder s = new StringBuilder();
         int i = 0;
 
@@ -41,10 +68,10 @@ public class ResponseBuilder {
         if (i != 0) {
             s.deleteCharAt(s.length() - 1);
         }
-
-
-        s.append("},\"time\" : " + elapsed + "}");
-
         return s.toString();
+    }
+
+    private static String buildKeyAddition(String key, String value) {
+        return new String(".\"" + key + "\" : " + value);
     }
 }

@@ -34,10 +34,24 @@
  * to do so, delete this exception statement from your version.
  */
 
-package com.redhat.thermostat.web2.endpoint.command;
+package com.redhat.thermostat.web2.endpoint.web.request;
 
 public class TimedRequest <T> {
     private long elapsed = 0;
+    private TimedRunnable<T> r;
+
+    public TimedRequest() {}
+
+    public TimedRequest(TimedRunnable<T> r) {
+        this.r = r;
+    }
+
+    public T run() {
+        long start = System.nanoTime();
+        T value = r.run();
+        elapsed = System.nanoTime() - start;
+        return value;
+    }
 
     public T run(TimedRunnable<T> r) {
         long start = System.nanoTime();
