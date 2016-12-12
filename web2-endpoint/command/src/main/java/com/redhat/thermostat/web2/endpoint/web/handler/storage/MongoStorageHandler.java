@@ -1,7 +1,7 @@
 package com.redhat.thermostat.web2.endpoint.web.handler.storage;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Context;
@@ -45,7 +45,7 @@ public class MongoStorageHandler implements StorageHandler {
                 final int limit = Math.min(Integer.valueOf(count), MAX_MONGO_DOCUMENTS);
                 final int sortOrder = Integer.valueOf(sort);
                 final String userName = securityContext.getUserPrincipal().getName();
-                final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName));
+                final Bson filter = RequestFilters.buildGetFilter(agentId, Collections.singletonList(userName));
 
                 final StringBuilder prevCursor = new StringBuilder();
                 final StringBuilder nextCursor = new StringBuilder();
@@ -87,7 +87,7 @@ public class MongoStorageHandler implements StorageHandler {
 
         TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
 
-        /**
+        /*
          * TODO: Verify body matches expected schema
          * TODO: Clean up insertion of tags into JSON body
          */
@@ -118,7 +118,7 @@ public class MongoStorageHandler implements StorageHandler {
         final int size = Integer.valueOf(count);
 
         final String userName = securityContext.getUserPrincipal().getName();
-        final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName), maxTimestamp, minTimestamp);
+        final Bson filter = RequestFilters.buildGetFilter(agentId, Collections.singletonList(userName), maxTimestamp, minTimestamp);
 
         final int sortOrder = Integer.valueOf(sort);
 
@@ -151,7 +151,7 @@ public class MongoStorageHandler implements StorageHandler {
                         });
                         output.write(MongoResponseBuilder.buildJsonResponse(documents, request.getElapsed()));
 
-                        Thread.sleep(1000l);
+                        Thread.sleep(1000L);
                     }
                 } catch (IOException | InterruptedException e) {
                     // An IOException occurs when reader closes the connection
@@ -185,7 +185,7 @@ public class MongoStorageHandler implements StorageHandler {
                     };
                     String id = CursorStore.addCursor(userName, cursor);
 
-                    nextCursor.append(limit  + "-" + id);
+                    nextCursor.append(limit).append("-").append(id);
 
                 }
                 return query.run();
@@ -200,13 +200,15 @@ public class MongoStorageHandler implements StorageHandler {
                                                               StringBuilder prevCursor) {
         final MongoCursor cursorRequest = CursorStore.getCursor(userName, id);
 
+        assert cursorRequest != null;
+
         int next = skip + cursorRequest.limit;
         if (next < cursorRequest.size) {
-            nextCursor.append(next + "-" + id);
+            nextCursor.append(next).append("-").append(id);
         }
         int prev = skip - cursorRequest.limit;
         if (prev > -1) {
-            prevCursor.append(prev + "-" + id);
+            prevCursor.append(prev).append("-").append(id);
         }
 
         return new TimedRequest<>(new TimedRequest.TimedRunnable<FindIterable<Document>>() {

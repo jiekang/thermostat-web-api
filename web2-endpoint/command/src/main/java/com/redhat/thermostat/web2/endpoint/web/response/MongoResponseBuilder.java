@@ -23,13 +23,11 @@ public class MongoResponseBuilder {
      * }
      */
     public static String buildJsonResponse(FindIterable<Document> documents, long elapsed) {
-        StringBuilder s = new StringBuilder();
+        String s = buildJsonDocuments(documents) +
+                buildKeyAddition("time", "" + elapsed) +
+                "}";
 
-        s.append(buildJsonDocuments(documents));
-        s.append(buildKeyAddition("time", "" + elapsed));
-        s.append("}");
-
-        return s.toString();
+        return s;
     }
 
     public static String buildJsonResponse(FindIterable<Document> documents, long elapsed, String prevCursor, String nextCursor) {
@@ -62,7 +60,7 @@ public class MongoResponseBuilder {
             } else {
                 response = document.toJson();
             }
-            s.append("\"" + i + "\" : " + response + ",");
+            s.append("\"").append(i).append("\" : ").append(response).append(",");
             i++;
         }
 

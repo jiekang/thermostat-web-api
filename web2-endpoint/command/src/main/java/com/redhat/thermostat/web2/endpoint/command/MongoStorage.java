@@ -36,7 +36,7 @@
 
 package com.redhat.thermostat.web2.endpoint.command;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -55,17 +55,16 @@ public class MongoStorage {
         MongoStorage.dbName = dbName;
         MongoCredential credential = MongoCredential.createCredential(username, dbName, password);
         ServerAddress address = new ServerAddress("127.0.0.1", port);
-        mongoClient = new MongoClient(address, Arrays.asList(credential), new MongoClientOptions.Builder().serverSelectionTimeout(0).build());
+        mongoClient = new MongoClient(address, Collections.singletonList(credential), new MongoClientOptions.Builder().serverSelectionTimeout(0).build());
     }
 
     public static boolean isConnected() {
         try {
             mongoClient.getAddress();
+            return true;
         } catch (Exception e) {
             return false;
         }
-
-        return true;
     }
 
     public void finish() {

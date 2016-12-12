@@ -5,7 +5,7 @@ public class DocumentBuilder {
         StringBuilder tagBuilder = new StringBuilder();
         tagBuilder.append(",\"tags\":[\"agent\"");
         for (String tag : tags) {
-            tagBuilder.append(", \"" + tag + "\"");
+            tagBuilder.append(", \"").append(tag).append("\"");
         }
         tagBuilder.append("]}");
 
