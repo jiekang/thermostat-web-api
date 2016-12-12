@@ -20,7 +20,7 @@ import com.redhat.thermostat.web2.endpoint.web.cursor.MongoCursor;
 import com.redhat.thermostat.web2.endpoint.web.cursor.CursorStore;
 import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
 import com.redhat.thermostat.web2.endpoint.web.request.TimedRequest;
-import com.redhat.thermostat.web2.endpoint.web.response.ResponseBuilder;
+import com.redhat.thermostat.web2.endpoint.web.response.MongoResponseBuilder;
 
 public class MongoStorageHandler implements StorageHandler {
 
@@ -65,7 +65,7 @@ public class MongoStorageHandler implements StorageHandler {
 
         FindIterable<Document> documents = timedRequest.run();
 
-        return Response.status(Response.Status.OK).entity(ResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed(), prevCursor.toString(), nextCursor.toString())).build();
+        return Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed(), prevCursor.toString(), nextCursor.toString())).build();
     }
 
     private TimedRequest<FindIterable<Document>> handleNoCursor(final String userName,

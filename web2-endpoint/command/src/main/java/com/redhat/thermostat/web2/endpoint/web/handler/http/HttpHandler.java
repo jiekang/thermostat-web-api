@@ -61,7 +61,7 @@ import com.redhat.thermostat.web2.endpoint.web.handler.storage.StorageHandler;
 import com.redhat.thermostat.web2.endpoint.web.request.TimedRequest;
 import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
 import com.redhat.thermostat.web2.endpoint.web.json.DocumentBuilder;
-import com.redhat.thermostat.web2.endpoint.web.response.ResponseBuilder;
+import com.redhat.thermostat.web2.endpoint.web.response.MongoResponseBuilder;
 
 @Path("")
 @RolesAllowed("user")
@@ -141,6 +141,6 @@ public class HttpHandler {
             }
         });
 
-        return Response.status(Response.Status.OK).entity(ResponseBuilder.buildJsonResponse(documents, request.getElapsed())).build();
+        return Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, request.getElapsed())).build();
     }
 }

@@ -4,7 +4,8 @@ import org.bson.Document;
 
 import com.mongodb.client.FindIterable;
 
-public class ResponseBuilder {
+public class MongoResponseBuilder {
+
     /**
      * Responses in JSON:
      * {
@@ -21,7 +22,6 @@ public class ResponseBuilder {
      * "time" : elapsed
      * }
      */
-
     public static String buildJsonResponse(FindIterable<Document> documents, long elapsed) {
         StringBuilder s = new StringBuilder();
 
