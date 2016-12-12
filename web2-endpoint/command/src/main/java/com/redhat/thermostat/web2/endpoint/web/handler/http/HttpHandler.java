@@ -34,7 +34,7 @@
  * to do so, delete this exception statement from your version.
  */
 
-package com.redhat.thermostat.web2.endpoint.web.handler;
+package com.redhat.thermostat.web2.endpoint.web.handler.http;
 
 import java.util.Arrays;
 
@@ -57,6 +57,7 @@ import org.bson.conversions.Bson;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.redhat.thermostat.web2.endpoint.command.MongoStorage;
+import com.redhat.thermostat.web2.endpoint.web.handler.storage.StorageHandler;
 import com.redhat.thermostat.web2.endpoint.web.request.TimedRequest;
 import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
 import com.redhat.thermostat.web2.endpoint.web.json.DocumentBuilder;

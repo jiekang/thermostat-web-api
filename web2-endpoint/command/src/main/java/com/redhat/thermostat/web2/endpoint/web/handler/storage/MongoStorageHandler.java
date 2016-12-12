@@ -1,4 +1,4 @@
-package com.redhat.thermostat.web2.endpoint.web.handler;
+package com.redhat.thermostat.web2.endpoint.web.handler.storage;
 
 import java.util.Arrays;
 
@@ -22,7 +22,7 @@ import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
 import com.redhat.thermostat.web2.endpoint.web.request.TimedRequest;
 import com.redhat.thermostat.web2.endpoint.web.response.ResponseBuilder;
 
-public class MongoHandler implements StorageHandler {
+public class MongoStorageHandler implements StorageHandler {
 
     private final int MAX_MONGO_DOCUMENTS = 5000;
 

@@ -1,4 +1,4 @@
-package com.redhat.thermostat.web2.endpoint.web.handler;
+package com.redhat.thermostat.web2.endpoint.web.handler.storage;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
