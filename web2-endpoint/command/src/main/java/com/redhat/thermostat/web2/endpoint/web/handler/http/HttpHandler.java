@@ -49,6 +49,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.glassfish.jersey.server.ChunkedOutput;
+
 import com.redhat.thermostat.web2.endpoint.web.handler.storage.StorageHandler;
 
 @Path("")
@@ -83,12 +85,20 @@ public class HttpHandler {
     @GET
     @Path("agents/{agentId}/host/cpu")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getVmCpuInfo(@Context SecurityContext securityContext,
+    public Response getHostCpuInfo(@Context SecurityContext securityContext,
                                @PathParam("agentId") String agentId,
                                @QueryParam("size") @DefaultValue("1") String count,
                                @QueryParam("sort") @DefaultValue("-1") String sort,
                                @QueryParam("maxTimestamp") String maxTimestamp,
                                @QueryParam("minTimestamp") String minTimestamp) {
-        return handler.getVmCpuInfo(securityContext, agentId, count, sort, maxTimestamp, minTimestamp);
+        return handler.getHostCpuInfo(securityContext, agentId, count, sort, maxTimestamp, minTimestamp);
+    }
+
+    @GET
+    @Path("stream/agents/{agentId}/host/cpu")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ChunkedOutput<String> streamHostCpuInfo(@Context SecurityContext securityContext,
+                                         @PathParam("agentId") String agentId) {
+        return handler.streamHostCpuInfo(securityContext, agentId);
     }
 }

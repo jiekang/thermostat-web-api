@@ -1,5 +1,6 @@
 package com.redhat.thermostat.web2.endpoint.web.handler.storage;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import javax.ws.rs.DefaultValue;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.SecurityContext;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.glassfish.jersey.server.ChunkedOutput;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
@@ -96,7 +98,7 @@ public class MongoStorageHandler implements StorageHandler {
     }
 
     @Override
-    public Response getVmCpuInfo(@Context SecurityContext securityContext,
+    public Response getHostCpuInfo(@Context SecurityContext securityContext,
                                  @PathParam("agentId") String agentId,
                                  @QueryParam("size") @DefaultValue("1") String count,
                                  @QueryParam("sort") @DefaultValue("-1") String sort,
@@ -124,7 +126,44 @@ public class MongoStorageHandler implements StorageHandler {
         return Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, request.getElapsed())).build();
     }
 
-        private TimedRequest<FindIterable<Document>> handleNoCursor(final String userName,
+    @Override
+    public ChunkedOutput<String> streamHostCpuInfo(SecurityContext securityContext, String agentId) {
+        final ChunkedOutput<String> output = new ChunkedOutput<>(String.class, "\r\n");
+
+        new Thread() {
+            public void run() {
+                try {
+
+                    while (true) {
+                        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
+                        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+                            @Override
+                            public FindIterable<Document> run() {
+                                return MongoStorage.getDatabase().getCollection("cpu-stats").find().sort(new BasicDBObject("_id", -1)).limit(1);
+                            }
+                        });
+                        output.write(MongoResponseBuilder.buildJsonResponse(documents, request.getElapsed()));
+
+                        Thread.sleep(1000l);
+                    }
+                } catch (IOException | InterruptedException e) {
+                    // An IOException occurs when reader closes the connection
+                } finally {
+                    try {
+                        output.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+
+        // the output will be probably returned even before
+        // a first chunk is written by the new thread
+        return output;
+    }
+
+    private TimedRequest<FindIterable<Document>> handleNoCursor(final String userName,
                                                                 final int limit,
                                                                 final long count,
                                                                 final TimedRequest.TimedRunnable<FindIterable<Document>> query,

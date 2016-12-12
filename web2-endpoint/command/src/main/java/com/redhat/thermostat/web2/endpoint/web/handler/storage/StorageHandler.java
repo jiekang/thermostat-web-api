@@ -7,6 +7,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.glassfish.jersey.server.ChunkedOutput;
+
 public interface StorageHandler {
     Response getAgent(@Context SecurityContext securityContext,
                       @PathParam("agentId") String agentId,
@@ -17,10 +19,13 @@ public interface StorageHandler {
     Response putAgent(String body,
                       @Context SecurityContext context);
 
-    Response getVmCpuInfo(@Context SecurityContext securityContext,
+    Response getHostCpuInfo(@Context SecurityContext securityContext,
                           @PathParam("agentId") String agentId,
                           @QueryParam("size") @DefaultValue("1") String count,
                           @QueryParam("sort") @DefaultValue("-1") String sort,
                           @QueryParam("maxTimestamp") String maxTimestamp,
                           @QueryParam("minTimestamp") String minTimestamp);
+
+    ChunkedOutput<String> streamHostCpuInfo(SecurityContext securityContext,
+                                            String agentId);
 }
