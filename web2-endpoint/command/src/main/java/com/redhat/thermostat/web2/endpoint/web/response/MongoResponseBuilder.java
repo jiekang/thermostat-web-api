@@ -73,6 +73,6 @@ public class MongoResponseBuilder {
     }
 
     private static String buildKeyAddition(String key, String value) {
-        return new String(",\"" + key + "\" : " + value);
+        return ",\"" + key + "\" : " + value;
     }
 }
