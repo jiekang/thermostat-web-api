@@ -23,11 +23,9 @@ public class MongoResponseBuilder {
      * }
      */
     public static String buildJsonResponse(FindIterable<Document> documents, long elapsed) {
-        String s = buildJsonDocuments(documents) +
+        return buildJsonDocuments(documents) +
                 buildKeyAddition("time", "" + elapsed) +
                 "}";
-
-        return s;
     }
 
     public static String buildJsonResponse(FindIterable<Document> documents, long elapsed, String prevCursor, String nextCursor) {
@@ -36,10 +34,10 @@ public class MongoResponseBuilder {
         s.append(buildJsonDocuments(documents));
         s.append(buildKeyAddition("time", "" + elapsed));
 
-        if (prevCursor.length() > 0) {
+        if (prevCursor != null && prevCursor.length() > 0) {
             s.append(buildKeyAddition("prevCursor", prevCursor));
         }
-        if (nextCursor.length() > 0) {
+        if (nextCursor != null && nextCursor.length() > 0) {
             s.append(buildKeyAddition("nextCursor", nextCursor));
         }
 
