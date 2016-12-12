@@ -26,7 +26,8 @@ public class MongoResponseBuilder {
         StringBuilder s = new StringBuilder();
 
         s.append(buildJsonDocuments(documents));
-        s.append("},\"time\" : " + elapsed + "}");
+        s.append(buildKeyAddition("time", "" + elapsed));
+        s.append("}");
 
         return s.toString();
     }
@@ -72,6 +73,6 @@ public class MongoResponseBuilder {
     }
 
     private static String buildKeyAddition(String key, String value) {
-        return new String(".\"" + key + "\" : " + value);
+        return new String(",\"" + key + "\" : " + value);
     }
 }

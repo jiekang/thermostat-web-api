@@ -3,9 +3,7 @@ package com.redhat.thermostat.web2.endpoint.web.handler.storage;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -30,45 +28,54 @@ public class MongoStorageHandler implements StorageHandler {
     private final int MAX_MONGO_DOCUMENTS = 5000;
 
     @Override
-    public Response getAgent(@Context SecurityContext securityContext,
-                             @PathParam("agentId") String agentId,
-                             @QueryParam("size") @DefaultValue("1") String count,
-                             @QueryParam("sort") @DefaultValue("-1") String sort,
-                             @QueryParam("cursor") @DefaultValue("-1") String cursor) {
-        if (!MongoStorage.isConnected()) {
-            return Response.status(Response.Status.OK).entity("GET " + agentId + " " + count + " " + sort + " " + securityContext.getUserPrincipal().getName()).build();
-        }
-
-        final int limit = Math.min(Integer.valueOf(count), MAX_MONGO_DOCUMENTS);
-        final int sortOrder = Integer.valueOf(sort);
-        final String userName = securityContext.getUserPrincipal().getName();
-        final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName));
-
-        final StringBuilder prevCursor = new StringBuilder();
-        final StringBuilder nextCursor = new StringBuilder();
-
-        TimedRequest<FindIterable<Document>> timedRequest;
-
-        if (cursor.equals("-1")) {
-            TimedRequest.TimedRunnable<FindIterable<Document>> query = new TimedRequest.TimedRunnable<FindIterable<Document>>() {
-                @Override
-                public FindIterable<Document> run() {
-                    return MongoStorage.getDatabase().getCollection("agents").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+    public void getAgent(final SecurityContext securityContext,
+                         final AsyncResponse asyncResponse,
+                         final String agentId,
+                         final String count,
+                         final String sort,
+                         final String cursor) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (!MongoStorage.isConnected()) {
+                    asyncResponse.resume(Response.status(Response.Status.OK).entity("GET " + agentId + " " + count + " " + sort + " " + securityContext.getUserPrincipal().getName()).build());
+                    return;
                 }
-            };
 
-            final long size = MongoStorage.getDatabase().getCollection("agents").count(filter);
-            timedRequest = handleNoCursor(userName, limit, size, query, nextCursor);
-        } else if (CursorStore.isValid(userName, cursor)) {
-            final CursorId cursorId = new CursorId(cursor);
-            timedRequest = handleCursor(cursorId.skip, cursorId.id, userName, nextCursor, prevCursor);
-        } else {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
+                final int limit = Math.min(Integer.valueOf(count), MAX_MONGO_DOCUMENTS);
+                final int sortOrder = Integer.valueOf(sort);
+                final String userName = securityContext.getUserPrincipal().getName();
+                final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName));
 
-        FindIterable<Document> documents = timedRequest.run();
+                final StringBuilder prevCursor = new StringBuilder();
+                final StringBuilder nextCursor = new StringBuilder();
 
-        return Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed(), prevCursor.toString(), nextCursor.toString())).build();
+                TimedRequest<FindIterable<Document>> timedRequest;
+
+                if (cursor.equals("-1")) {
+                    TimedRequest.TimedRunnable<FindIterable<Document>> query = new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+                        @Override
+                        public FindIterable<Document> run() {
+                            return MongoStorage.getDatabase().getCollection("agents").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+                        }
+                    };
+
+                    final long size = MongoStorage.getDatabase().getCollection("agents").count(filter);
+                    timedRequest = handleNoCursor(userName, limit, size, query, nextCursor);
+                } else if (CursorStore.isValid(userName, cursor)) {
+                    final CursorId cursorId = new CursorId(cursor);
+                    timedRequest = handleCursor(cursorId.skip, cursorId.id, userName, nextCursor, prevCursor);
+                } else {
+                    asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).build());
+                    return;
+                }
+
+                FindIterable<Document> documents = timedRequest.run();
+
+                asyncResponse.resume(Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed(), prevCursor.toString(), nextCursor.toString())).build());
+            }
+        }).start();
+
     }
 
     @Override
@@ -98,12 +105,12 @@ public class MongoStorageHandler implements StorageHandler {
     }
 
     @Override
-    public Response getHostCpuInfo(@Context SecurityContext securityContext,
-                                 @PathParam("agentId") String agentId,
-                                 @QueryParam("size") @DefaultValue("1") String count,
-                                 @QueryParam("sort") @DefaultValue("-1") String sort,
-                                 @QueryParam("maxTimestamp") String maxTimestamp,
-                                 @QueryParam("minTimestamp") String minTimestamp) {
+    public Response getHostCpuInfo(SecurityContext securityContext,
+                                   String agentId,
+                                   String count,
+                                   String sort,
+                                   String maxTimestamp,
+                                   String minTimestamp) {
         if (!MongoStorage.isConnected()) {
             return Response.status(Response.Status.OK).entity(agentId + count + sort + maxTimestamp + minTimestamp).build();
         }
@@ -187,10 +194,10 @@ public class MongoStorageHandler implements StorageHandler {
     }
 
     private TimedRequest<FindIterable<Document>> handleCursor(final int skip,
-                                                              final String id,
-                                                              final String userName,
-                                                              final StringBuilder nextCursor,
-                                                              final StringBuilder prevCursor) {
+                                                              String id,
+                                                              String userName,
+                                                              StringBuilder nextCursor,
+                                                              StringBuilder prevCursor) {
         final MongoCursor cursorRequest = CursorStore.getCursor(userName, id);
 
         int next = skip + cursorRequest.limit;

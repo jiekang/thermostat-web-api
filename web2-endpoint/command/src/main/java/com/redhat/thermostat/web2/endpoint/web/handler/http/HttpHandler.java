@@ -44,6 +44,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -66,12 +68,13 @@ public class HttpHandler {
     @GET
     @Path("agents/{agentId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAgent(@Context SecurityContext securityContext,
+    public void getAgent(@Context SecurityContext securityContext,
+                             @Suspended final AsyncResponse asyncResponse,
                              @PathParam("agentId") String agentId,
                              @QueryParam("size") @DefaultValue("1") String count,
                              @QueryParam("sort") @DefaultValue("-1") String sort,
                              @QueryParam("cursor") @DefaultValue("-1") String cursor) {
-        return handler.getAgent(securityContext, agentId, count, sort, cursor);
+        handler.getAgent(securityContext, asyncResponse, agentId, count, sort, cursor);
     }
 
     @PUT
