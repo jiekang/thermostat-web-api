@@ -47,7 +47,7 @@ public class CursorStore {
             String id = cursor.substring(cursor.indexOf("-") + 1);
             if  (userMap.containsKey(user) && userMap.get(user).containsKey(id)) {
                 MongoCursor mongoCursor = userMap.get(user).get(id);
-                if (front * mongoCursor.limit <= mongoCursor.size) {
+                if (front * mongoCursor.limit < mongoCursor.size) {
                     return  true;
                 }
             }
