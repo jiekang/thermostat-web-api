@@ -14,4 +14,13 @@ public interface StorageHandler {
                       @QueryParam("sort") @DefaultValue("-1") String sort,
                       @QueryParam("cursor") @DefaultValue("-1") String cursor);
 
+    Response putAgent(String body,
+                      @Context SecurityContext context);
+
+    Response getVmCpuInfo(@Context SecurityContext securityContext,
+                          @PathParam("agentId") String agentId,
+                          @QueryParam("size") @DefaultValue("1") String count,
+                          @QueryParam("sort") @DefaultValue("-1") String sort,
+                          @QueryParam("maxTimestamp") String maxTimestamp,
+                          @QueryParam("minTimestamp") String minTimestamp);
 }

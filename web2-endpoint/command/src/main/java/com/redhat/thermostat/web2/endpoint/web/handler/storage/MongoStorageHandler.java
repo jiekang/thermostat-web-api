@@ -19,6 +19,7 @@ import com.redhat.thermostat.web2.endpoint.web.cursor.CursorId;
 import com.redhat.thermostat.web2.endpoint.web.cursor.MongoCursor;
 import com.redhat.thermostat.web2.endpoint.web.cursor.CursorStore;
 import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
+import com.redhat.thermostat.web2.endpoint.web.json.DocumentBuilder;
 import com.redhat.thermostat.web2.endpoint.web.request.TimedRequest;
 import com.redhat.thermostat.web2.endpoint.web.response.MongoResponseBuilder;
 
@@ -68,7 +69,62 @@ public class MongoStorageHandler implements StorageHandler {
         return Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed(), prevCursor.toString(), nextCursor.toString())).build();
     }
 
-    private TimedRequest<FindIterable<Document>> handleNoCursor(final String userName,
+    @Override
+    public Response putAgent(String body,
+                             @Context SecurityContext context) {
+        if (!MongoStorage.isConnected()) {
+            return Response.status(Response.Status.OK).entity("PUT " + context.getUserPrincipal().getName() + "\n\n" + body).build();
+        }
+
+        TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
+
+        /**
+         * TODO: Verify body matches expected schema
+         * TODO: Clean up insertion of tags into JSON body
+         */
+        final Document item = Document.parse(DocumentBuilder.addTags(body, context.getUserPrincipal().getName()));
+
+        timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                MongoStorage.getDatabase().getCollection("agents").insertOne(item);
+                return null;
+            }
+        });
+
+        return Response.status(Response.Status.OK).entity("PUT successful").build();
+    }
+
+    @Override
+    public Response getVmCpuInfo(@Context SecurityContext securityContext,
+                                 @PathParam("agentId") String agentId,
+                                 @QueryParam("size") @DefaultValue("1") String count,
+                                 @QueryParam("sort") @DefaultValue("-1") String sort,
+                                 @QueryParam("maxTimestamp") String maxTimestamp,
+                                 @QueryParam("minTimestamp") String minTimestamp) {
+        if (!MongoStorage.isConnected()) {
+            return Response.status(Response.Status.OK).entity(agentId + count + sort + maxTimestamp + minTimestamp).build();
+        }
+
+        final int size = Integer.valueOf(count);
+
+        final String userName = securityContext.getUserPrincipal().getName();
+        final Bson filter = RequestFilters.buildGetFilter(agentId, Arrays.asList(userName), maxTimestamp, minTimestamp);
+
+        final int sortOrder = Integer.valueOf(sort);
+
+        TimedRequest<FindIterable<Document>> request = new TimedRequest<>();
+        FindIterable<Document> documents = request.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+            @Override
+            public FindIterable<Document> run() {
+                return MongoStorage.getDatabase().getCollection("cpu-stats").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(size);
+            }
+        });
+
+        return Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, request.getElapsed())).build();
+    }
+
+        private TimedRequest<FindIterable<Document>> handleNoCursor(final String userName,
                                                                 final int limit,
                                                                 final long count,
                                                                 final TimedRequest.TimedRunnable<FindIterable<Document>> query,
