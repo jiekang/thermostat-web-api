@@ -15,9 +15,6 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
 import com.redhat.thermostat.web2.endpoint.command.MongoStorage;
-import com.redhat.thermostat.web2.endpoint.web.cursor.CursorId;
-import com.redhat.thermostat.web2.endpoint.web.cursor.MongoCursor;
-import com.redhat.thermostat.web2.endpoint.web.cursor.CursorStore;
 import com.redhat.thermostat.web2.endpoint.web.filters.RequestFilters;
 import com.redhat.thermostat.web2.endpoint.web.json.DocumentBuilder;
 import com.redhat.thermostat.web2.endpoint.web.request.TimedRequest;
@@ -32,8 +29,7 @@ public class MongoStorageHandler implements StorageHandler {
                          final AsyncResponse asyncResponse,
                          final String agentId,
                          final String count,
-                         final String sort,
-                         final String cursor) {
+                         final String sort) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -47,35 +43,18 @@ public class MongoStorageHandler implements StorageHandler {
                 final String userName = securityContext.getUserPrincipal().getName();
                 final Bson filter = RequestFilters.buildGetFilter(agentId, Collections.singletonList(userName));
 
-                final StringBuilder prevCursor = new StringBuilder();
-                final StringBuilder nextCursor = new StringBuilder();
+                TimedRequest<FindIterable<Document>> timedRequest = new TimedRequest<>();
 
-                TimedRequest<FindIterable<Document>> timedRequest;
+                FindIterable<Document> documents = timedRequest.run(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
+                    @Override
+                    public FindIterable<Document> run() {
+                        return MongoStorage.getDatabase().getCollection("agents").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
+                    }
+                });
 
-                if (cursor.equals("-1")) {
-                    TimedRequest.TimedRunnable<FindIterable<Document>> query = new TimedRequest.TimedRunnable<FindIterable<Document>>() {
-                        @Override
-                        public FindIterable<Document> run() {
-                            return MongoStorage.getDatabase().getCollection("agents").find(filter).sort(new BasicDBObject("_id", sortOrder)).limit(limit);
-                        }
-                    };
-
-                    final long size = MongoStorage.getDatabase().getCollection("agents").count(filter);
-                    timedRequest = handleNoCursor(userName, limit, size, query, nextCursor);
-                } else if (CursorStore.isValid(userName, cursor)) {
-                    final CursorId cursorId = new CursorId(cursor);
-                    timedRequest = handleCursor(cursorId.skip, cursorId.id, userName, nextCursor, prevCursor);
-                } else {
-                    asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).build());
-                    return;
-                }
-
-                FindIterable<Document> documents = timedRequest.run();
-
-                asyncResponse.resume(Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed(), prevCursor.toString(), nextCursor.toString())).build());
+                asyncResponse.resume(Response.status(Response.Status.OK).entity(MongoResponseBuilder.buildJsonResponse(documents, timedRequest.getElapsed())).build());
             }
         }).start();
-
     }
 
     @Override
@@ -166,56 +145,5 @@ public class MongoStorageHandler implements StorageHandler {
         }.start();
 
         return output;
-    }
-
-    private TimedRequest<FindIterable<Document>> handleNoCursor(final String userName,
-                                                                final int limit,
-                                                                final long count,
-                                                                final TimedRequest.TimedRunnable<FindIterable<Document>> query,
-                                                                final StringBuilder nextCursor) {
-        return new TimedRequest<>(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
-            @Override
-            public FindIterable<Document> run() {
-                if (count > limit) {
-                    MongoCursor cursor = new MongoCursor(count, limit) {
-                        @Override
-                        public FindIterable<Document> run(int skip) {
-                            return  query.run().skip(skip);
-                        }
-                    };
-                    String id = CursorStore.addCursor(userName, cursor);
-
-                    nextCursor.append(limit).append("-").append(id);
-
-                }
-                return query.run();
-            }
-        });
-    }
-
-    private TimedRequest<FindIterable<Document>> handleCursor(final int skip,
-                                                              String id,
-                                                              String userName,
-                                                              StringBuilder nextCursor,
-                                                              StringBuilder prevCursor) {
-        final MongoCursor cursorRequest = CursorStore.getCursor(userName, id);
-
-        assert cursorRequest != null;
-
-        int next = skip + cursorRequest.limit;
-        if (next < cursorRequest.size) {
-            nextCursor.append(next).append("-").append(id);
-        }
-        int prev = skip - cursorRequest.limit;
-        if (prev > -1) {
-            prevCursor.append(prev).append("-").append(id);
-        }
-
-        return new TimedRequest<>(new TimedRequest.TimedRunnable<FindIterable<Document>>() {
-            @Override
-            public FindIterable<Document> run() {
-                return cursorRequest.run(skip);
-            }
-        });
     }
 }

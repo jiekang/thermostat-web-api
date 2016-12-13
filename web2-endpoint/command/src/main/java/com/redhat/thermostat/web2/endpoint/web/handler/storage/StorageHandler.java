@@ -11,8 +11,7 @@ public interface StorageHandler {
                   AsyncResponse asyncResponse,
                   String agentId,
                   String count,
-                  String sort,
-                  String cursor);
+                  String sort);
 
     Response putAgent(String body,
                       SecurityContext context);

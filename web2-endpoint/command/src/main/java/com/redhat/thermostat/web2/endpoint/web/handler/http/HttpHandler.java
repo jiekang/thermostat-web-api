@@ -72,9 +72,8 @@ public class HttpHandler {
                              @Suspended final AsyncResponse asyncResponse,
                              @PathParam("agentId") String agentId,
                              @QueryParam("size") @DefaultValue("1") String count,
-                             @QueryParam("sort") @DefaultValue("-1") String sort,
-                             @QueryParam("cursor") @DefaultValue("-1") String cursor) {
-        handler.getAgent(securityContext, asyncResponse, agentId, count, sort, cursor);
+                             @QueryParam("sort") @DefaultValue("-1") String sort) {
+        handler.getAgent(securityContext, asyncResponse, agentId, count, sort);
     }
 
     @PUT
