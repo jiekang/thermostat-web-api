@@ -65,10 +65,11 @@ public class MongoResponseBuilder {
         if (i != 0) {
             s.deleteCharAt(s.length() - 1);
         }
+        s.append("}");
         return s.toString();
     }
 
     private static String buildKeyAddition(String key, String value) {
-        return ",\"" + key + "\" : " + value;
+        return ",\"" + key + "\" : \"" + value + "\"";
     }
 }
