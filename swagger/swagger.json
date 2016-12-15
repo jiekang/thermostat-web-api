@@ -536,6 +536,88 @@
                 }
             }
         },
+        "/agents/{agentId}/host/vms/{vmId}/class/stats": {
+            "parameters": [
+                {
+                    "$ref": "#/parameters/agent-id"
+                },
+                {
+                    "$ref": "#/parameters/vm-id"
+                }
+            ],
+            "get": {
+                "description": "Gets most recent class statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/parameters/maxTimestamp"
+                    },
+                    {
+                        "$ref": "#/parameters/minTimestamp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-class-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "description": "Gets most recent class statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/filters"
+                    },
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-class-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "description": "Adds class statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/vm-class-stats"
+                    },
+                    {
+                        "$ref": "#/parameters/tags"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            }
+        },
         "/agents/{agentId}/host/vms/{vmId}/cpu/stats": {
             "parameters": [
                 {
@@ -617,6 +699,416 @@
                     }
                 }
             }
+        },
+        "/agents/{agentId}/host/vms/{vmId}/compiler/stats": {
+            "parameters": [
+                {
+                    "$ref": "#/parameters/agent-id"
+                },
+                {
+                    "$ref": "#/parameters/vm-id"
+                }
+            ],
+            "get": {
+                "description": "Gets most recent compiler statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/parameters/maxTimestamp"
+                    },
+                    {
+                        "$ref": "#/parameters/minTimestamp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-compiler-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "description": "Gets most recent compiler statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/filters"
+                    },
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-compiler-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "description": "Adds compiler statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/vm-compiler-stats"
+                    },
+                    {
+                        "$ref": "#/parameters/tags"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/agents/{agentId}/host/vms/{vmId}/gc/stats": {
+            "parameters": [
+                {
+                    "$ref": "#/parameters/agent-id"
+                },
+                {
+                    "$ref": "#/parameters/vm-id"
+                }
+            ],
+            "get": {
+                "description": "Gets most recent gc statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/parameters/maxTimestamp"
+                    },
+                    {
+                        "$ref": "#/parameters/minTimestamp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-gc-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "description": "Gets most recent gc statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/filters"
+                    },
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-gc-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "description": "Adds gc statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/vm-gc-stats"
+                    },
+                    {
+                        "$ref": "#/parameters/tags"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/agents/{agentId}/host/vms/{vmId}/io/stats": {
+            "parameters": [
+                {
+                    "$ref": "#/parameters/agent-id"
+                },
+                {
+                    "$ref": "#/parameters/vm-id"
+                }
+            ],
+            "get": {
+                "description": "Gets most recent io statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/parameters/maxTimestamp"
+                    },
+                    {
+                        "$ref": "#/parameters/minTimestamp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-io-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "description": "Gets most recent io statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/filters"
+                    },
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-io-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "description": "Adds io statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/vm-io-stats"
+                    },
+                    {
+                        "$ref": "#/parameters/tags"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/agents/{agentId}/host/vms/{vmId}/memory/stats": {
+            "parameters": [
+                {
+                    "$ref": "#/parameters/agent-id"
+                },
+                {
+                    "$ref": "#/parameters/vm-id"
+                }
+            ],
+            "get": {
+                "description": "Gets most recent memory statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/parameters/maxTimestamp"
+                    },
+                    {
+                        "$ref": "#/parameters/minTimestamp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-memory-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "description": "Gets most recent memory statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/filters"
+                    },
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-memory-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "description": "Adds memory statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/vm-memory-stats"
+                    },
+                    {
+                        "$ref": "#/parameters/tags"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            }
+        },
+        "/agents/{agentId}/host/vms/{vmId}/numa/stats": {
+            "parameters": [
+                {
+                    "$ref": "#/parameters/agent-id"
+                },
+                {
+                    "$ref": "#/parameters/vm-id"
+                }
+            ],
+            "get": {
+                "description": "Gets most recent NUMA statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "$ref": "#/parameters/maxTimestamp"
+                    },
+                    {
+                        "$ref": "#/parameters/minTimestamp"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-numa-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "post": {
+                "description": "Gets most recent NUMA statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/filters"
+                    },
+                    {
+                        "$ref": "#/parameters/count"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/vm-numa-stats"
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            },
+            "put": {
+                "description": "Adds NUMA statistics for the jvm",
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/vm-numa-stats"
+                    },
+                    {
+                        "$ref": "#/parameters/tags"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "$ref": "#/responses/unauthorized"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -676,6 +1168,24 @@
             "type": "object"
         },
         "vm-cpu-stats": {
+            "type": "object"
+        },
+        "vm-class-stats": {
+            "type": "object"
+        },
+        "vm-compiler-stats": {
+            "type": "object"
+        },
+        "vm-gc-stats": {
+            "type": "object"
+        },
+        "vm-io-stats": {
+            "type": "object"
+        },
+        "vm-memory-stats": {
+            "type": "object"
+        },
+        "vm-numa-stats": {
             "type": "object"
         }
     },
@@ -778,10 +1288,64 @@
         "vm-cpu-stats": {
             "name": "vmCpuStats",
             "in": "body",
-            "description": "The jvm CPU information",
+            "description": "The jvm CPU statistics",
             "required": true,
             "schema": {
                 "$ref": "#/definitions/vm-cpu-stats"
+            }
+        },
+        "vm-class-stats": {
+            "name": "vmClassStats",
+            "in": "body",
+            "description": "The jvm class statistics",
+            "required": true,
+            "schema": {
+                "$ref": "#/definitions/vm-class-stats"
+            }
+        },
+        "vm-compiler-stats": {
+            "name": "vmCompilerStats",
+            "in": "body",
+            "description": "The jvm compiler statistics",
+            "required": true,
+            "schema": {
+                "$ref": "#/definitions/vm-compiler-stats"
+            }
+        },
+        "vm-gc-stats": {
+            "name": "vmGcStats",
+            "in": "body",
+            "description": "The jvm gc statistics",
+            "required": true,
+            "schema": {
+                "$ref": "#/definitions/vm-gc-stats"
+            }
+        },
+        "vm-io-stats": {
+            "name": "vmIoStats",
+            "in": "body",
+            "description": "The jvm io statistics",
+            "required": true,
+            "schema": {
+                "$ref": "#/definitions/vm-io-stats"
+            }
+        },
+        "vm-memory-stats": {
+            "name": "vmMemoryStats",
+            "in": "body",
+            "description": "The jvm memory statistics",
+            "required": true,
+            "schema": {
+                "$ref": "#/definitions/vm-memory-stats"
+            }
+        },
+        "vm-numa-stats": {
+            "name": "vmNumaStats",
+            "in": "body",
+            "description": "The jvm NUMA statistics",
+            "required": true,
+            "schema": {
+                "$ref": "#/definitions/vm-numa-stats"
             }
         },
         "tags": {
