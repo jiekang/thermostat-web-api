@@ -31,6 +31,9 @@ paths:
   /schema:
     get:
       description: Gets schema information for the storage
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
       responses:
         401:
           $ref: '#/responses/unauthorized'
@@ -62,6 +65,9 @@ paths:
       - $ref: '#/parameters/agent-id'    
     get:
       description: Gets information for an agent. Use 'all' as the agentId to query all agents
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
       responses:
         401:
           $ref: '#/responses/unauthorized'
@@ -93,6 +99,9 @@ paths:
       - $ref: '#/parameters/agent-id'    
     get:
       description: Gets backend information for an agent.
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
       responses:
         401:
           $ref: '#/responses/unauthorized'
@@ -124,6 +133,9 @@ paths:
       - $ref: '#/parameters/agent-id'
     get:
       description: Gets information for the host machine monitored by the agent
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
       responses:
         401:
           $ref: '#/responses/unauthorized'      
@@ -140,12 +152,22 @@ paths:
           $ref: '#/responses/unauthorized'      
         200:
           description: OK
+    delete:
+      description: Deletes host information for the agent
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
 # network-info
   /agents/{agentId}/host/network:
     parameters:
       - $ref: '#/parameters/agent-id'
     get:
       description: Gets network information for the host machine
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
       responses:
         401:
           $ref: '#/responses/unauthorized'      
@@ -162,38 +184,121 @@ paths:
           $ref: '#/responses/unauthorized'      
         200:
           description: OK  
-    
-
-
-
-
-# numa-host-info
-# numa-stat
+    delete:
+      description: Deletes network information for the agent
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
 
 # cpu-stats
-  /agents/{agentId}/host/cpu:
+  /agents/{agentId}/host/cpu/stats:
     parameters:
       - $ref: '#/parameters/agent-id'
     get:
-      description: Gets cpu information for the host
+      description: Gets most recent CPU statistics for the host
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/maxTimestamp'
+        - $ref: '#/parameters/minTimestamp'
       responses:
         401:
           $ref: '#/responses/unauthorized'      
         200:
           description: OK
           schema:
-            $ref: '#/definitions/host-cpu-info'
+            $ref: '#/definitions/host-cpu-stats'
     put:
-      description: Adds or updates cpu information for the host machine
+      description: Adds or updates CPU statistics for the host machine
       parameters:
-        - $ref: '#/parameters/network-info'
+        - $ref: '#/parameters/host-cpu-stats'
       responses:
         401:
           $ref: '#/responses/unauthorized'      
         200:
           description: OK  
 # memory-stats
-
+  /agents/{agentId}/host/memory/stats:
+    parameters:
+      - $ref: '#/parameters/agent-id'
+    get:
+      description: Gets most recent memory statistics for the host
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/maxTimestamp'
+        - $ref: '#/parameters/minTimestamp'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/host-memory-stats'
+    put:
+      description: Adds or updates memory statistics for the host machine
+      parameters:
+        - $ref: '#/parameters/host-memory-stats'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK  
+# numa-host-info
+  /agents/{agentId}/host/numa:
+    parameters:
+      - $ref: '#/parameters/agent-id'
+    get:
+      description: Gets NUMA information for the host
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/host-numa-info'
+    put:
+      description: Adds or updates NUMA information for the host machine
+      parameters:
+        - $ref: '#/parameters/host-numa-info'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK  
+# numa-stat
+  /agents/{agentId}/host/numa/stats:
+    parameters:
+      - $ref: '#/parameters/agent-id'
+    get:
+      description: Gets NUMA statistics for the host
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
+        - $ref: '#/parameters/maxTimestamp'
+        - $ref: '#/parameters/minTimestamp'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/host-numa-stats'
+    put:
+      description: Adds or updates NUMA statistics for the host machine
+      parameters:
+        - $ref: '#/parameters/host-numa-stats'
+      responses:
+        401:
+          $ref: '#/responses/unauthorized'      
+        200:
+          description: OK  
+          
 # vm-info
   /agents/{agentId}/host/vms/{vmId}:
     parameters:
@@ -201,6 +306,9 @@ paths:
       - $ref: '#/parameters/vm-id'    
     get:
       description: Gets information for a jvm monitored by an agent
+      parameters:
+        - $ref: '#/parameters/count'
+        - $ref: '#/parameters/sort'
       responses:
         401:
           $ref: '#/responses/unauthorized'      
@@ -213,12 +321,12 @@ paths:
 # vm-gc-stats
 # vm-numa-stats
 # vm-cpu-stats
-  /agents/{agentId}/vms/{vmId}/cpu:
+  /agents/{agentId}/host/vms/{vmId}/cpu/stats:
     parameters:
       - $ref: '#/parameters/agent-id'
       - $ref: '#/parameters/vm-id'
     get:
-      description: Gets most recent cpu information for the jvm
+      description: Gets most recent cpu statistics for the jvm
       parameters:
         - $ref: '#/parameters/count'
         - $ref: '#/parameters/sort'
@@ -230,9 +338,9 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/vm-cpu-info'
+            $ref: '#/definitions/vm-cpu-stats'
     post:
-      description: Gets most recent cpu information for the jvm
+      description: Gets most recent cpu statistics for the jvm
       parameters:
         - $ref: '#/parameters/filters'
         - $ref: '#/parameters/count'
@@ -243,11 +351,11 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/vm-cpu-info'
+            $ref: '#/definitions/vm-cpu-stats'
     put:
-      description: Adds cpu information for the jvm
+      description: Adds cpu statistics for the jvm
       parameters:
-        - $ref: '#/parameters/vm-cpu-info'
+        - $ref: '#/parameters/vm-cpu-stats'
         - $ref: '#/parameters/tags'
       responses:
         401:
@@ -308,12 +416,19 @@ definitions:
   network-info:
     type: object
     
-  host-cpu-info:
+  host-cpu-stats:
+    type: object
+  host-memory-stats:
+    type: object
+    
+  host-numa-info:
+    type: object
+  host-numa-stats:
     type: object
     
   vm-info:
     type: object
-  vm-cpu-info:
+  vm-cpu-stats:
     type: object
     
 parameters:
@@ -364,14 +479,44 @@ parameters:
     required: true
     schema:
       $ref: '#/definitions/network-info'
-  
-  vm-cpu-info:
-    name: vmCpuInfo
+
+  host-cpu-stats:
+    name: hostCpuStats
+    in: body
+    description: The host cpu statistics
+    required: true
+    schema:
+      $ref: '#/definitions/host-cpu-stats'
+  host-memory-stats:
+    name: hostMemoryStats
+    in: body
+    description: The host memory statistics
+    required: true
+    schema:
+      $ref: '#/definitions/host-memory-stats'
+
+  host-numa-info:
+    name: hostNumaInfo
+    in: body
+    description: The host NUMA information
+    required: true
+    schema:
+      $ref: '#/definitions/host-numa-info'
+  host-numa-stats:
+    name: hostNumaStats
+    in: body
+    description: The host NUMA statistics
+    required: true
+    schema:
+      $ref: '#/definitions/host-numa-stats'
+
+  vm-cpu-stats:
+    name: vmCpuStats
     in: body
     description: The jvm CPU information
     required: true
     schema:
-      $ref: '#/definitions/vm-cpu-info'
+      $ref: '#/definitions/vm-cpu-stats'
     
   tags:
     name: tags

@@ -36,7 +36,10 @@
 
 package com.redhat.thermostat.web2.endpoint.command;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -44,10 +47,14 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.Resource;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
@@ -84,6 +91,24 @@ public class WebEndpointCommand extends AbstractCommand {
         config.register(new BasicAuthFilter());
         config.register(new RolesAllowedDynamicFeature());
 
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setDirectoriesListed(true);
+        resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
+        resourceHandler.setResourceBase("");
+        URL u = this.getClass().getResource("/swagger/index.html");
+        URI root = null;
+        try {
+            root = u.toURI().resolve("./").normalize();
+        } catch (URISyntaxException e) {
+        }
+        try {
+            resourceHandler.setBaseResource(Resource.newResource(root));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        config.register(resourceHandler);
+
         server = JettyHttpContainerFactory.createServer(baseUri, config, false);
 
         HttpConfiguration httpConfig = new HttpConfiguration();
@@ -102,8 +127,15 @@ public class WebEndpointCommand extends AbstractCommand {
 
         server.setConnectors(new Connector[]{httpConnector});
 
+
+        Handler orig = server.getHandler();
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[] { resourceHandler, orig});
+        server.setHandler(handlers);
+
         try {
             server.start();
+            System.out.println(server.dump());
             server.join();
         } catch (Exception e) {
             e.printStackTrace();

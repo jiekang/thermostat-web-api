@@ -55,7 +55,7 @@ import org.glassfish.jersey.server.ChunkedOutput;
 
 import com.redhat.thermostat.web2.endpoint.web.handler.storage.StorageHandler;
 
-@Path("")
+@Path("api")
 @RolesAllowed("user")
 public class HttpHandler {
 
