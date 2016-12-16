@@ -79,7 +79,6 @@ import com.redhat.thermostat.web2.endpoint.web.handler.storage.MongoStorageHandl
 public class WebEndpointCommand extends AbstractCommand {
 
     private Server server;
-    private MongoStorage storage;
 
     @Reference
     CommonPaths commonPaths;
@@ -162,7 +161,7 @@ public class WebEndpointCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            storage.finish();
+            MongoStorage.finish();
             stop();
         }
     }

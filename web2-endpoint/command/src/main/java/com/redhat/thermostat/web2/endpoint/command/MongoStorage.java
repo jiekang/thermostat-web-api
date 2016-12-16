@@ -67,7 +67,7 @@ public class MongoStorage {
         }
     }
 
-    public void finish() {
+    public static void finish() {
         mongoClient.close();
     }
 
