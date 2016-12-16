@@ -45,16 +45,21 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Property;
+import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.Service;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
@@ -63,6 +68,7 @@ import com.redhat.thermostat.common.cli.AbstractCommand;
 import com.redhat.thermostat.common.cli.Command;
 import com.redhat.thermostat.common.cli.CommandContext;
 import com.redhat.thermostat.common.cli.CommandException;
+import com.redhat.thermostat.shared.config.CommonPaths;
 import com.redhat.thermostat.web2.endpoint.security.BasicAuthFilter;
 import com.redhat.thermostat.web2.endpoint.web.handler.http.HttpHandler;
 import com.redhat.thermostat.web2.endpoint.web.handler.storage.MongoStorageHandler;
@@ -74,6 +80,9 @@ public class WebEndpointCommand extends AbstractCommand {
 
     private Server server;
     private MongoStorage storage;
+
+    @Reference
+    CommonPaths commonPaths;
 
     @Override
     public void run(CommandContext ctx) throws CommandException {
@@ -120,12 +129,25 @@ public class WebEndpointCommand extends AbstractCommand {
 //        httpConfig.setSendServerVersion(true);
 //        httpConfig.setSendDateHeader(false);
 
-        ServerConnector httpConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
-        httpConnector.setHost("localhost");
-        httpConnector.setIdleTimeout(30000);
-        httpConnector.setPort(port);
+        SslContextFactory sslContextFactory = new SslContextFactory();
 
-        server.setConnectors(new Connector[]{httpConnector});
+        sslContextFactory.setKeyStorePath(commonPaths.getUserThermostatHome().getAbsolutePath() + "/server.keystore");
+        sslContextFactory.setKeyStorePassword("password");
+
+        // SSL HTTP Configuration
+        HttpConfiguration sslConfig = new HttpConfiguration(httpConfig);
+        sslConfig.addCustomizer(new SecureRequestCustomizer());
+
+        // SSL Connector
+        ServerConnector sslConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(sslConfig));
+        sslConnector.setHost("localhost");
+        sslConnector.setPort(port + 1);
+        sslConnector.setIdleTimeout(30000);
+
+
+        server.setConnectors(new Connector[]{sslConnector});
 
 
         Handler orig = server.getHandler();
