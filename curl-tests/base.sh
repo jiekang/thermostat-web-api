@@ -4,7 +4,7 @@
 # $2 password
 # $3 url
 get() {
-  curl -s -X GET --user $1:$2 "$3"
+  curl -s -k -v -X GET --user $1:$2 "$3"
 }
 
 # $1 user
@@ -12,7 +12,7 @@ get() {
 # $3 url
 # $4 body
 post() {
-  curl -s -X POST --user $1:$2 -d "$4" "$3"
+  curl -s -k -v -X POST --user $1:$2 -d "$4" "$3"
 }
 
 # $1 user
@@ -20,7 +20,7 @@ post() {
 # $3 url
 # $4 body
 put() {
-  curl -s -X PUT --user $1:$2 -d "$4" "$3"
+  curl -s -k -v -X PUT --user $1:$2 -d "$4" "$3"
 }
 
 check() {
