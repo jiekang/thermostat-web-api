@@ -76,12 +76,12 @@ import com.redhat.thermostat.web2.endpoint.web.handler.storage.MongoStorageHandl
 @Component
 @Service(Command.class)
 @Property(name=Command.NAME, value="web-endpoint")
-public class WebEndpointCommand extends AbstractCommand {
+class WebEndpointCommand extends AbstractCommand {
 
     private Server server;
 
     @Reference
-    CommonPaths commonPaths;
+    private CommonPaths commonPaths;
 
     @Override
     public void run(CommandContext ctx) throws CommandException {
@@ -104,14 +104,11 @@ public class WebEndpointCommand extends AbstractCommand {
         resourceHandler.setWelcomeFiles(new String[]{ "index.html" });
         resourceHandler.setResourceBase("");
         URL u = this.getClass().getResource("/swagger/index.html");
-        URI root = null;
+        URI root;
         try {
             root = u.toURI().resolve("./").normalize();
-        } catch (URISyntaxException e) {
-        }
-        try {
             resourceHandler.setBaseResource(Resource.newResource(root));
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             e.printStackTrace();
         }
 

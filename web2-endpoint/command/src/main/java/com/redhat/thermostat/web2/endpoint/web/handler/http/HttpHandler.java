@@ -59,7 +59,7 @@ import com.redhat.thermostat.web2.endpoint.web.handler.storage.StorageHandler;
 @RolesAllowed("user")
 public class HttpHandler {
 
-    private StorageHandler handler;
+    private final StorageHandler handler;
 
     public HttpHandler(StorageHandler handler) {
         this.handler = handler;

@@ -27,7 +27,7 @@ public class RequestFilters {
          * @param minTimestamp a minimum timestamp
          * @return the Bson filter
          */
-    public static Bson buildGetFilter(String agentId, String vmId, List<String> tags, String maxTimestamp, String minTimestamp) {
+    private static Bson buildGetFilter(String agentId, String vmId, List<String> tags, String maxTimestamp, String minTimestamp) {
 
         List<Bson> filters = new ArrayList<>();
 

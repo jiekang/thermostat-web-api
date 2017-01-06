@@ -56,7 +56,7 @@ public class BasicAuthFilter implements ContainerRequestFilter {
     private final UserStore userStore;
 
     public BasicAuthFilter() {
-        this.userStore = new UserStore();
+        this(new UserStore());
     }
 
     public BasicAuthFilter(UserStore userStore) {

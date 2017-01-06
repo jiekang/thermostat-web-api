@@ -40,8 +40,8 @@ import java.security.Principal;
 
 import javax.ws.rs.core.SecurityContext;
 
-public class BasicSecurityContext implements SecurityContext {
-    private BasicUser user;
+class BasicSecurityContext implements SecurityContext {
+    private final BasicUser user;
     public BasicSecurityContext(BasicUser user) {
         this.user = user;
     }

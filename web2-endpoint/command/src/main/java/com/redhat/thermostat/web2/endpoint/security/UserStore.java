@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserStore {
+class UserStore {
     private final Map<String, BasicUser> userStore;
 
     public UserStore() {
