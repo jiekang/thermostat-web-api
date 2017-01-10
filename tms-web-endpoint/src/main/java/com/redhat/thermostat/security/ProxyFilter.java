@@ -22,7 +22,8 @@ public class ProxyFilter implements ContainerRequestFilter{
             throw new NotAuthorizedException("Authentication credentials are required");
         }
 
-        BasicUser user = userStore.getUser("alpha");
+        System.out.println("X-SSSD-REMOTE-USER: " + username);
+        BasicUser user = userStore.getUser(username);
         if (user == null) {
             throw new NotAuthorizedException("Authentication credentials are required");
         }

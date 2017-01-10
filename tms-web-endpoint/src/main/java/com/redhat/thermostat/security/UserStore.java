@@ -46,8 +46,8 @@ class UserStore {
 
     public UserStore() {
         userStore = new HashMap<>();
-        userStore.put("alpha", new BasicUser("alpha", new ArrayList<>(Arrays.asList("alpha", "user"))));
-        userStore.put("beta", new BasicUser("beta", new ArrayList<>(Arrays.asList("beta", "user"))));
+        userStore.put("admin@EXAMPLE.COM", new BasicUser("admin@EXAMPLE.COM", new ArrayList<>(Arrays.asList("admin@EXAMPLE.COM", "user"))));
+        userStore.put("user@EXAMPLE.COM", new BasicUser("user@EXAMPLE.COM", new ArrayList<>(Arrays.asList("user@EXAMPLE.COM", "user"))));
 
     }
 
