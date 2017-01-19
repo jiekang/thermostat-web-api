@@ -76,7 +76,7 @@ import com.redhat.thermostat.web2.endpoint.web.handler.storage.MongoStorageHandl
 @Component
 @Service(Command.class)
 @Property(name=Command.NAME, value="web-endpoint")
-class WebEndpointCommand extends AbstractCommand {
+public class WebEndpointCommand extends AbstractCommand {
 
     private Server server;
 
