@@ -41,17 +41,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-class UserStore {
-    private final Map<String, BasicUser> userStore;
+public class UserStore {
+    private final Map<String, WebUser> userStore;
 
     public UserStore() {
         userStore = new HashMap<>();
-        userStore.put("alpha", new BasicUser("alpha", "alpha".toCharArray(), new ArrayList<>(Arrays.asList("alpha", "user"))));
-        userStore.put("beta", new BasicUser("beta", "beta".toCharArray(), new ArrayList<>(Arrays.asList("beta", "user"))));
-
+        userStore.put("admin@EXAMPLE.COM", new BasicWebUser("admin@EXAMPLE.COM", new ArrayList<>(Arrays.asList("admin@EXAMPLE.COM", "user"))));
+        userStore.put("user@EXAMPLE.COM", new BasicWebUser("user@EXAMPLE.COM", new ArrayList<>(Arrays.asList("user@EXAMPLE.COM", "user"))));
     }
 
-    public BasicUser getUser(String userName) {
+    public WebUser getUser(String userName) {
         return userStore.get(userName);
     }
 }

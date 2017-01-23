@@ -34,15 +34,18 @@
  * to do so, delete this exception statement from your version.
  */
 
-package com.redhat.thermostat.web2.endpoint.security;
+package com.redhat.thermostat.web2.endpoint.security.auth.basic;
 
 import java.security.Principal;
 
 import javax.ws.rs.core.SecurityContext;
 
+import com.redhat.thermostat.web2.endpoint.security.WebUser;
+
 class BasicSecurityContext implements SecurityContext {
-    private final BasicUser user;
-    public BasicSecurityContext(BasicUser user) {
+    private final WebUser user;
+
+    public BasicSecurityContext(WebUser user) {
         this.user = user;
     }
 

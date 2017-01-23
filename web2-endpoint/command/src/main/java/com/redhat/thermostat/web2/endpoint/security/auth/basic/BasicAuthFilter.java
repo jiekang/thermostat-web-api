@@ -34,7 +34,7 @@
  * to do so, delete this exception statement from your version.
  */
 
-package com.redhat.thermostat.web2.endpoint.security;
+package com.redhat.thermostat.web2.endpoint.security.auth.basic;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -48,6 +48,9 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.DatatypeConverter;
+
+import com.redhat.thermostat.web2.endpoint.security.AuthWebUser;
+import com.redhat.thermostat.web2.endpoint.security.UserStore;
 
 @Provider
 @Priority(Priorities.AUTHENTICATION)
@@ -84,7 +87,7 @@ public class BasicAuthFilter implements ContainerRequestFilter {
             String username = values[0];
             String password = values[1];
 
-            BasicUser user = userStore.getUser(username);
+            AuthWebUser user = (AuthWebUser) userStore.getUser(username);
             if (user == null) {
                 throw new NotAuthorizedException("Authentication credentials are required");
             }

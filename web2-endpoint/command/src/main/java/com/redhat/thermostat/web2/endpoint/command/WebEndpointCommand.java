@@ -69,7 +69,8 @@ import com.redhat.thermostat.common.cli.Command;
 import com.redhat.thermostat.common.cli.CommandContext;
 import com.redhat.thermostat.common.cli.CommandException;
 import com.redhat.thermostat.shared.config.CommonPaths;
-import com.redhat.thermostat.web2.endpoint.security.BasicAuthFilter;
+import com.redhat.thermostat.web2.endpoint.security.auth.basic.BasicAuthFilter;
+import com.redhat.thermostat.web2.endpoint.security.auth.proxy.ProxyAuthFilter;
 import com.redhat.thermostat.web2.endpoint.web.handler.http.HttpHandler;
 import com.redhat.thermostat.web2.endpoint.web.handler.storage.MongoStorageHandler;
 
@@ -96,7 +97,7 @@ public class WebEndpointCommand extends AbstractCommand {
         URI baseUri = UriBuilder.fromUri("http://localhost").port(8080).build();
         ResourceConfig config = new ResourceConfig();
         config.register(new HttpHandler(new MongoStorageHandler()));
-        config.register(new BasicAuthFilter());
+        config.register(new ProxyAuthFilter());
         config.register(new RolesAllowedDynamicFeature());
 
         ResourceHandler resourceHandler = new ResourceHandler();
