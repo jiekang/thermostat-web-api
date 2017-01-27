@@ -126,25 +126,16 @@ public class WebEndpointCommand extends AbstractCommand {
 //        httpConfig.setSendServerVersion(true);
 //        httpConfig.setSendDateHeader(false);
 
-        SslContextFactory sslContextFactory = new SslContextFactory();
-
-        sslContextFactory.setKeyStorePath(commonPaths.getUserThermostatHome().getAbsolutePath() + "/server.keystore");
-        sslContextFactory.setKeyStorePassword("password");
-
-        // SSL HTTP Configuration
-        HttpConfiguration sslConfig = new HttpConfiguration(httpConfig);
-        sslConfig.addCustomizer(new SecureRequestCustomizer());
-
-        // SSL Connector
-        ServerConnector sslConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(sslConfig));
-        sslConnector.setHost("localhost");
-        sslConnector.setPort(port + 1);
-        sslConnector.setIdleTimeout(30000);
+        httpConfig.addCustomizer(new org.eclipse.jetty.server.ForwardedRequestCustomizer());
 
 
-        server.setConnectors(new Connector[]{sslConnector});
+        ServerConnector httpConnector = new ServerConnector(server,
+                new HttpConnectionFactory(httpConfig));
+        httpConnector.setHost("localhost");
+        httpConnector.setPort(port);
+        httpConnector.setIdleTimeout(30000);
+
+        server.setConnectors(new Connector[]{httpConnector});
 
 
         Handler orig = server.getHandler();
