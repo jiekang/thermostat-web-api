@@ -1,0 +1,66 @@
+Thermostat Web Server 
+
+
+Setup via Docker container
+==========================
+==========================
+
+This walks through the setup of Thermostat Web Server in a Docker container with authentication via Kerberos provided by a FreeIPA server running in another Docker container.
+
+By the end of this section a Thermostat Web Server will be running within a Docker container, accessible through the container's ip address and open port 80. Users will authenticate via Kerberos with the FreeIPA server in order to successfully request from the Thermostat Web Server.
+
+In the folder containing the Dockerfile, build the Docker image by running:
+
+$ docker build -t thermostat-web .
+
+Start a Docker container with:
+
+$ docker run --name thermostat-web-container \
+	-ti --privileged \
+	--link freeipa-server-container:ipa.example.com \
+	-e PASSWORD=password \
+	-h client-1.example.com \
+	-e IPA_CLIENT_INSTALL_OPTS="-d --domain=example.com --server=ipa.example.com --realm=EXAMPLE.COM" \
+	thermostat-web
+
+
+
+A FreeIPA server must be setup and accessible prior to setting up the Thermostat Web Server authentication layer. To setup a FreeIPA server for testing via a Docker container, see the FreeIPA Server section below.
+
+On the FreeIPA server container, add the client service via:
+
+$ ipa service-add HTTP/client-1.example.com --force
+
+On the Thermostat Web Server container authenticate as the admin and run the ipa-client-setup.sh script:
+
+$ kinit admin
+$ /root/ipa-client-setup.sh
+
+
+
+FreeIPA Server
+==============
+==============
+
+The FreeIPA Server Docker image is available at:
+
+https://hub.docker.com/r/freeipa/freeipa-server/
+
+$ docker pull freeipa/freeipa-server
+$ mkdir -p /var/lib/ipa-data
+$ docker run --name freeipa-server-container -ti \
+   -h ipa.example.com \
+   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+   --tmpfs /run --tmpfs /tmp \
+   -v /var/lib/ipa-data:/data:Z freeipa/freeipa-server
+
+Run the two commands above to start a FreeIPA Server container with host ipa.example.com
+
+Pay attention to the admin user password as it will be needed later.
+
+
+To use a built Docker image instead of the one provided by Docker Hub, see the README.md at:
+
+https://github.com/freeipa/freeipa-container
+
+
