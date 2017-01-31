@@ -15,6 +15,16 @@ Requirements:
 1. FreeIPA Server up and running. See the FreeIPA Server section for a guide to setting one up for testing
 #TODO: Thermostat should be in the image so users don't need to mount their own
 2. Thermostat image available on the system.
+3. Thermostat Web Server plugin available on the system.
+
+Build the Thermostat Web Server plugin
+
+$ cd <path-to-thermostat-web-server>
+$ mvn package
+
+In the Thermostat image, install the Thermostat Web Server plugin by running:
+
+$ unzip <path-to-thermostat-web-server>/distribution/target/thermostat-server-distribution-1.99.12-SNAPSHOT.zip -d <path-to-thermostat-image>/plugins
 
 In the folder containing the Dockerfile, build the Docker image by running:
 
