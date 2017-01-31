@@ -7,3 +7,4 @@ COPY thermostat.conf /etc/httpd/conf.d/thermostat.conf
 COPY ipa-client-setup.sh /root/ipa-client-setup.sh
 
 RUN mkdir -p /root/data/db && touch /root/data/mongod.log
+RUN mkdir -p /run/dbus && touch /run/dbus/system_bus_socket

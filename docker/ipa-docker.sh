@@ -4,7 +4,7 @@ THERMOSTAT_IMAGE=/home/jkang/work/thermostat/tms-work/distribution/target/image
 
 docker run --name tms-ipa-web-$1 \
 	-ti --privileged \
-	--link freeipa-server-container-1:ipa.example.com \
+	--link freeipa-server-container-2:ipa.example.com \
 	-e PASSWORD=password \
 	-v ${THERMOSTAT_IMAGE}:/root/thermostat \
 	-h client-$1.example.com \

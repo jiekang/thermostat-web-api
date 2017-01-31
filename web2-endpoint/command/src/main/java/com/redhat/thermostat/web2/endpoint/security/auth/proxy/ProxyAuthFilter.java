@@ -25,6 +25,11 @@ public class ProxyAuthFilter implements ContainerRequestFilter{
             throw new NotAuthorizedException("Authentication credentials are required");
         }
 
+        String groups = requestContext.getHeaderString("X-SSSD-REMOTE-GROUPS");
+        if (groups != null) {
+            System.out.println("GROUPS: " + groups);
+        }
+
         WebUser user = userStore.getUser(username);
         if (user == null) {
             throw new NotAuthorizedException("Authentication credentials are required");
