@@ -78,6 +78,15 @@
                 "description": "Query system information",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
                         "$ref": "#/parameters/filters"
                     }
                 ],
@@ -202,6 +211,15 @@
             "post": {
                 "description": "Query agent information",
                 "parameters": [
+                    {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
                     {
                         "$ref": "#/parameters/filters"
                     }
@@ -332,6 +350,15 @@
                 "description": "Query JVM information",
                 "parameters": [
                     {
+                        "$ref": "#/parameters/limit"
+                    },
+                    {
+                        "$ref": "#/parameters/offset"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
                         "$ref": "#/parameters/filters"
                     }
                 ],
@@ -410,9 +437,14 @@
     },
     "definitions": {
         "namespaces": {
-            "type": "array",
-            "items": {
-                "type": "string"
+            "type": "object",
+            "properties": {
+                "namespaces": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
             }
         },
         "filters": {

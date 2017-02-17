@@ -1,0 +1,788 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Thermostat Web API"
+  license:
+    name: "GPL v2 with Classpath Exception"
+    url: "http://www.gnu.org/licenses"
+basePath: "/api/v100"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+- "text/html; charset=utf-8"
+paths:
+  /:
+    get:
+      description: "Get namespaces"
+      operationId: "rootGET"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/namespaces"
+      x-swagger-router-controller: "Default"
+  /{namespace}/systems:
+    get:
+      description: "Get system information"
+      operationId: "namespaceSystemsGET"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit of items to return."
+        required: false
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "Offset of items to return."
+        required: false
+        type: "integer"
+      - name: "sort"
+        in: "query"
+        description: "Sort string"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/system-info"
+      x-swagger-router-controller: "Default"
+    post:
+      description: "Query system information"
+      operationId: "namespaceSystemsPOST"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit of items to return."
+        required: false
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "Offset of items to return."
+        required: false
+        type: "integer"
+      - name: "sort"
+        in: "query"
+        description: "Sort string"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "filters"
+        description: "Key, Comparator, Value trios to filter the data"
+        required: false
+        schema:
+          $ref: "#/definitions/filters"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/system-info"
+      x-swagger-router-controller: "Default"
+    put:
+      description: "Add or update system information"
+      operationId: "namespaceSystemsPUT"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "tags"
+        in: "query"
+        description: "CSV of tags"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "systemInfo"
+        description: "The system information"
+        required: true
+        schema:
+          $ref: "#/definitions/system-info"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+    delete:
+      description: "Delete system information"
+      operationId: "namespaceSystemsDELETE"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemIds"
+        in: "query"
+        description: "A list of system identities"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+  /{namespace}/systems/{systemId}:
+    get:
+      description: "Get system information"
+      operationId: "namespaceSystemsSystemIdGET"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/system-info"
+      x-swagger-router-controller: "Default"
+    put:
+      description: "Add or update system information"
+      operationId: "namespaceSystemsSystemIdPUT"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "tags"
+        in: "query"
+        description: "CSV of tags"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "systemInfo"
+        description: "The system information"
+        required: true
+        schema:
+          $ref: "#/definitions/system-info"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+    delete:
+      description: "Delete system information"
+      operationId: "namespaceSystemsSystemIdDELETE"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+  /{namespace}/systems/{systemId}/agents:
+    get:
+      description: "Get agent information"
+      operationId: "namespaceSystemsSystemIdAgentsGET"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit of items to return."
+        required: false
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "Offset of items to return."
+        required: false
+        type: "integer"
+      - name: "sort"
+        in: "query"
+        description: "Sort string"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/agent-info"
+        401:
+          description: "Access prohibited."
+      x-swagger-router-controller: "Default"
+    post:
+      description: "Query agent information"
+      operationId: "namespaceSystemsSystemIdAgentsPOST"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit of items to return."
+        required: false
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "Offset of items to return."
+        required: false
+        type: "integer"
+      - name: "sort"
+        in: "query"
+        description: "Sort string"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "filters"
+        description: "Key, Comparator, Value trios to filter the data"
+        required: false
+        schema:
+          $ref: "#/definitions/filters"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/agent-info"
+      x-swagger-router-controller: "Default"
+    put:
+      description: "Adds or updates agent information"
+      operationId: "namespaceSystemsSystemIdAgentsPUT"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "tags"
+        in: "query"
+        description: "CSV of tags"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "agentInfo"
+        description: "The agent information"
+        required: true
+        schema:
+          $ref: "#/definitions/agent-info"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+    delete:
+      description: "Delete agent information"
+      operationId: "namespaceSystemsSystemIdAgentsDELETE"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+  /{namespace}/systems/{systemId}/agents/{agentId}:
+    get:
+      description: "Get agent information"
+      operationId: "namespaceSystemsSystemIdAgentsAgentIdGET"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/agent-info"
+        401:
+          description: "Access prohibited."
+      x-swagger-router-controller: "Default"
+    put:
+      description: "Adds or updates agent information"
+      operationId: "namespaceSystemsSystemIdAgentsAgentIdPUT"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "tags"
+        in: "query"
+        description: "CSV of tags"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "agentInfo"
+        description: "The agent information"
+        required: true
+        schema:
+          $ref: "#/definitions/agent-info"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+    delete:
+      description: "Delete agent information"
+      operationId: "namespaceSystemsSystemIdAgentsAgentIdDELETE"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+  /{namespace}/system/{systemId}/agents/{agentId}/jvms:
+    get:
+      description: "Get JVM information"
+      operationId: "namespaceSystemSystemIdAgentsAgentIdJvmsGET"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit of items to return."
+        required: false
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "Offset of items to return."
+        required: false
+        type: "integer"
+      - name: "sort"
+        in: "query"
+        description: "Sort string"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/jvm-info"
+        401:
+          description: "Access prohibited."
+      x-swagger-router-controller: "Default"
+    post:
+      description: "Query JVM information"
+      operationId: "namespaceSystemSystemIdAgentsAgentIdJvmsPOST"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit of items to return."
+        required: false
+        type: "integer"
+      - name: "offset"
+        in: "query"
+        description: "Offset of items to return."
+        required: false
+        type: "integer"
+      - name: "sort"
+        in: "query"
+        description: "Sort string"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "filters"
+        description: "Key, Comparator, Value trios to filter the data"
+        required: false
+        schema:
+          $ref: "#/definitions/filters"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/jvm-info"
+      x-swagger-router-controller: "Default"
+    put:
+      description: "Adds or updates JVM information"
+      operationId: "namespaceSystemSystemIdAgentsAgentIdJvmsPUT"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "tags"
+        in: "query"
+        description: "CSV of tags"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "jvmInfo"
+        description: "The jvm information"
+        required: true
+        schema:
+          $ref: "#/definitions/jvm-info"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+    delete:
+      description: "Delete JVM information"
+      operationId: "namespaceSystemSystemIdAgentsAgentIdJvmsDELETE"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+  /{namespace}/systems/{systemId}/agents/{agentId}/jvms/{jvmId}:
+    get:
+      description: "Get JVM information"
+      operationId: "namespaceSystemsSystemIdAgentsAgentIdJvmsJvmIdGET"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "jvmId"
+        in: "path"
+        description: "The JVM identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/jvm-info"
+        401:
+          description: "Access prohibited."
+      x-swagger-router-controller: "Default"
+    put:
+      description: "Adds or updates JVM information"
+      operationId: "namespaceSystemsSystemIdAgentsAgentIdJvmsJvmIdPUT"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "jvmId"
+        in: "path"
+        description: "The JVM identity"
+        required: true
+        type: "string"
+      - name: "tags"
+        in: "query"
+        description: "CSV of tags"
+        required: false
+        type: "string"
+      - in: "body"
+        name: "jvmInfo"
+        description: "The jvm information"
+        required: true
+        schema:
+          $ref: "#/definitions/jvm-info"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+    delete:
+      description: "Delete JVM information"
+      operationId: "namespaceSystemsSystemIdAgentsAgentIdJvmsJvmIdDELETE"
+      parameters:
+      - name: "namespace"
+        in: "path"
+        description: "The namespace"
+        required: true
+        type: "string"
+      - name: "systemId"
+        in: "path"
+        description: "The system identity"
+        required: true
+        type: "string"
+      - name: "agentId"
+        in: "path"
+        description: "The agent identity"
+        required: true
+        type: "string"
+      - name: "jvmId"
+        in: "path"
+        description: "The JVM identity"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "Default"
+definitions:
+  namespaces:
+    type: "object"
+    properties:
+      namespaces:
+        type: "array"
+        items:
+          type: "string"
+  filters:
+    type: "array"
+    items:
+      $ref: "#/definitions/filter"
+  filter:
+    type: "object"
+    required:
+    - "comparator"
+    - "key"
+    - "value"
+    properties:
+      key:
+        type: "string"
+      comparator:
+        type: "string"
+      value:
+        type: "string"
+  system-info:
+    type: "array"
+    items:
+      type: "object"
+      properties: {}
+  agent-info:
+    type: "array"
+    items:
+      type: "object"
+      properties: {}
+  jvm-info:
+    type: "array"
+    items:
+      type: "object"
+      properties: {}
+parameters:
+  namespace:
+    name: "namespace"
+    in: "path"
+    description: "The namespace"
+    required: true
+    type: "string"
+  system-ids:
+    name: "systemIds"
+    in: "query"
+    description: "A list of system identities"
+    required: true
+    type: "string"
+  system-id:
+    name: "systemId"
+    in: "path"
+    description: "The system identity"
+    required: true
+    type: "string"
+  agent-id:
+    name: "agentId"
+    in: "path"
+    description: "The agent identity"
+    required: true
+    type: "string"
+  jvm-id:
+    name: "jvmId"
+    in: "path"
+    description: "The JVM identity"
+    required: true
+    type: "string"
+  system-info:
+    in: "body"
+    name: "systemInfo"
+    description: "The system information"
+    required: true
+    schema:
+      $ref: "#/definitions/system-info"
+  agent-info:
+    in: "body"
+    name: "agentInfo"
+    description: "The agent information"
+    required: true
+    schema:
+      $ref: "#/definitions/agent-info"
+  jvm-info:
+    in: "body"
+    name: "jvmInfo"
+    description: "The jvm information"
+    required: true
+    schema:
+      $ref: "#/definitions/jvm-info"
+  tags:
+    name: "tags"
+    in: "query"
+    description: "CSV of tags"
+    required: false
+    type: "string"
+  limit:
+    name: "limit"
+    in: "query"
+    description: "Limit of items to return."
+    required: false
+    type: "integer"
+  offset:
+    name: "offset"
+    in: "query"
+    description: "Offset of items to return."
+    required: false
+    type: "integer"
+  filters:
+    in: "body"
+    name: "filters"
+    description: "Key, Comparator, Value trios to filter the data"
+    required: false
+    schema:
+      $ref: "#/definitions/filters"
+  sort:
+    name: "sort"
+    in: "query"
+    description: "Sort string"
+    required: false
+    type: "string"
+responses:
+  ok:
+    description: "OK"
+  unauthorized:
+    description: "Access prohibited."

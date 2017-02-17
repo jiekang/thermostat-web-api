@@ -1,5 +1,6 @@
 package com.redhat.thermostat.server.core;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -139,7 +140,7 @@ public class CoreServer {
         try {
             root = u.toURI().resolve("./").normalize();
             resourceHandler.setBaseResource(Resource.newResource(root));
-        } catch (URISyntaxException | MalformedURLException e) {
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
         return resourceHandler;
