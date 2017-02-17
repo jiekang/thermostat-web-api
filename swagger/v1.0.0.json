@@ -17,6 +17,19 @@
     ],
     "basePath": "/api/v100",
     "paths": {
+        "/": {
+            "get": {
+                "description": "Get namespaces",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/namespaces"
+                        }
+                    }
+                }
+            }
+        },
         "/{namespace}/systems": {
             "parameters": [
                 {
@@ -40,10 +53,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/system-info"
-                            }
+                            "$ref": "#/definitions/system-info"
                         }
                     }
                 }
@@ -109,10 +119,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/system-info"
-                            }
+                            "$ref": "#/definitions/system-info"
                         }
                     }
                 }
@@ -168,10 +175,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/agent-info"
-                            }
+                            "$ref": "#/definitions/agent-info"
                         }
                     },
                     "401": {
@@ -238,10 +242,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/agent-info"
-                            }
+                            "$ref": "#/definitions/agent-info"
                         }
                     },
                     "401": {
@@ -303,10 +304,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/jvm-info"
-                            }
+                            "$ref": "#/definitions/jvm-info"
                         }
                     },
                     "401": {
@@ -376,10 +374,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/jvm-info"
-                            }
+                            "$ref": "#/definitions/jvm-info"
                         }
                     },
                     "401": {
@@ -414,6 +409,12 @@
         }
     },
     "definitions": {
+        "namespaces": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "filters": {
             "type": "array",
             "items": {
@@ -440,13 +441,22 @@
             ]
         },
         "system-info": {
-            "type": "object"
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         },
         "agent-info": {
-            "type": "object"
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         },
         "jvm-info": {
-            "type": "object"
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         }
     },
     "parameters": {
