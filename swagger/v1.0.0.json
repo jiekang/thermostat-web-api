@@ -293,7 +293,7 @@
                 }
             }
         },
-        "/{namespace}/system/{systemId}/agents/{agentId}/jvms": {
+        "/{namespace}/systems/{systemId}/agents/{agentId}/jvms": {
             "parameters": [
                 {
                     "$ref": "#/parameters/namespace"
