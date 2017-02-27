@@ -1,28 +1,14 @@
-Thermostat Web Server
+Thermostat Web API Repository
 
-The maven project is in the 'server' directory. It depends on Thermostat being available.
-Run
+This repository contains work for developing a Thermostat Web Server that provides RESTful API to input and output data to and from the backing storage.
 
-$ mvn install
+server: codebase for the server (current)
 
-on a local Thermostat repository to place the required dependency in your local maven
-repository. Then build with:
+docker: docker scripts and files to create working freeipa client/server containers for the reverse proxy auth system
+nodejs: swagger implementation in nodejs
+prototype: containes multiple projects prototyping various features for the Web Server
+swagger: contains the json files for the swagger API
+util: contains utility scripts for the Web Server
 
-$ mvn package
-
-
-To install the Web Server into a Thermostat installation, you can unzip
-"server/distribution/target/thermostat-server-distribution-1.99.12-SNAPSHOT.zip"
-into "<path-to-thermostat-distribution>/image".
-
-There is a "util/install-plugin.sh" that can be run from within the "server" folder
-to unzip the distribution for you. Make sure to modify the THERMOSTAT_HOME variable
-in the script to point to a valid Thermostat repository before running the script.
-
-
-The Web Server will attempt to connect to mongod://127.0.0.1:27518 'thermostat'
-with credentials 'mongodevuser' and 'mongodevpassword'. A valid mongod instance
-can be created and started by running:
-
-$ thermostat-devsetup
-$ thermostat storage --start
+certs: helper scripts to create certs for TLS/SSL (unused)
+curl-tests: bash scripts to exercise the server via curl (unused)
