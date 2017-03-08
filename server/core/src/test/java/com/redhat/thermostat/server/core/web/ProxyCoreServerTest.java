@@ -27,9 +27,28 @@ public class ProxyCoreServerTest extends ProxyCoreServerTestSetup {
     public void testGetNoGroups() throws InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
         String url = baseUrl + "/namespace/systems/systemId";
 
-        ContentResponse getResponse = client.newRequest(url).method(HttpMethod.GET).header("X-SSSD-REMOTE-USERS", "user").send();
+        ContentResponse getResponse = client.newRequest(url).method(HttpMethod.GET).header("X-SSSD-REMOTE-USER", "user").send();
 
         assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), getResponse.getStatus());
+    }
+
+    @Test
+    public void testGetGroupMismatch() throws InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+        String url = baseUrl + "/namespace/systems/systemId";
+
+        ContentResponse getResponse = client.newRequest(url).method(HttpMethod.GET).header("X-SSSD-REMOTE-USER", "user").header("X-SSSD-REMOTE-USER-GROUPS", "thermostat-systems-x").send();
+
+        assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), getResponse.getStatus());
+    }
+
+
+    @Test
+    public void testGetGroupMatch() throws InterruptedException, ExecutionException, TimeoutException, URISyntaxException {
+        String url = baseUrl + "/namespace/systems/systemId";
+
+        ContentResponse getResponse = client.newRequest(url).method(HttpMethod.GET).header("X-SSSD-REMOTE-USER", "user").header("X-SSSD-REMOTE-USER-GROUPS", "thermostat-namespaces-all:thermostat-systems-systemId").send();
+
+        assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), getResponse.getStatus());
     }
 
 }
