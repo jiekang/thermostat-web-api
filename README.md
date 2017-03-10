@@ -1,3 +1,16 @@
+# Note
+
+The codebase has now moved to:
+http://icedtea.classpath.org/hg/thermostat-ng/web-gateway/
+
+The git mirror for this is
+https://github.com/jiekang/thermostat-web-gateway
+
+
+Please head to those repositories instead.
+
+
+
 [![Build Status](https://travis-ci.org/jiekang/thermostat-web-api.svg?branch=master)](https://travis-ci.org/jiekang/thermostat-web-api)
 
 Thermostat Web API Repository
